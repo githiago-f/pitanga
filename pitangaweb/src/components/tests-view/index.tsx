@@ -1,11 +1,18 @@
 import './style.css';
+import { TestItem } from './test-item';
 
-export const TestsView = () => {
+type Props = {
+  tests?: any[]
+};
+
+export const TestsView = (props: Props) => {
   return (
     <div className='test-container'>
       <ul>
         <li><h3>Tests</h3></li>
-        <li>teste 1</li>
+        {props.tests?.map((test) => (
+          <TestItem {...test} />
+        ))}
       </ul>
     </div>
   );
