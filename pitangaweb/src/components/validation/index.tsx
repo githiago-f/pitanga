@@ -1,5 +1,5 @@
 import './style.css';
-import { TestItem } from './test-item';
+import { ValidationItem } from './test-item';
 
 type Props = {
   tests?: any[];
@@ -11,7 +11,7 @@ export const ValidationContainer = (props: Props) => {
       <ol>
         <li><h3>Tests</h3></li>
         {props.tests?.map((test) => (
-          <TestItem {...test} />
+          <ValidationItem {...test} />
         ))}
       </ol>
     </div>
