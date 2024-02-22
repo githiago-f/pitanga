@@ -1,14 +1,10 @@
-export enum ValidationStatus {
-  OK = 'Ok',
-  FAIL = 'Fail',
-  NONE = 'None'
-}
-
+/**
+ * Composed by the last version of the solution
+ * proposed by the student.
+ */
 export class Validation {
-  public readonly title: string;
-  public readonly description: string;
-  public readonly status: ValidationStatus;
-
   public readonly input: string;
   public readonly output: string;
+
+  public readonly resultStatus: string;
 }

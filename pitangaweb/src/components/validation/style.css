@@ -1,4 +1,4 @@
-.test-container {
+.validation-container {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -7,7 +7,7 @@
   padding: 3rem;
 }
 
-.test-container ul {
+.validation-container ol {
   background-color: white;
   border-radius: 0.75rem;
   list-style: none;
