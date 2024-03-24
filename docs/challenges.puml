@@ -1,2 +1,25 @@
-@startuml "challenges"
+@startuml "challenge-creation"
+
+start
+
+    :User creates\na new challenge;
+    :New activity notification;
+end
+
+@enduml
+
+@startuml "challenge-solving"
+start
+    split
+        :Selects a challenge from\nchallenges list to try;
+    split again
+        :Start a challenge\nfrom notifications;
+    end split
+
+    :Read the challenge's description;
+    repeat
+        :Code a solution;
+        :Check if the code pass validations;
+    repeat while (Validation has errors) is (yes) not (no)
+end
 @enduml

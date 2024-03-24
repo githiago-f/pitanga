@@ -3,8 +3,8 @@
  * proposed by the student.
  */
 export class Validation {
-  public readonly input: string;
-  public readonly output: string;
+  public readonly input!: string;
+  public readonly output!: string;
 
-  public readonly resultStatus: string;
+  public readonly resultStatus!: string;
 }
