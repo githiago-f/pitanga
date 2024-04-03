@@ -1,0 +1,14 @@
+# spring.sql.init.data-locations=classpath:db/data.sql
+spring:
+    jpa:
+        show-sql: true
+    sql:
+        init:
+            mode: always
+            schema-locations: classpath:db/schema.sql
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://idp.example.com/issuer
+                    
