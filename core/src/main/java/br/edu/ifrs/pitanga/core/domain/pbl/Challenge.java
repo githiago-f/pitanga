@@ -1,7 +1,34 @@
 package br.edu.ifrs.pitanga.core.domain.pbl;
 
-public record Challenge(
-    Long id,
-    String title,
-    String description
-) {}
+import java.util.List;
+import java.util.UUID;
+
+import br.edu.ifrs.pitanga.core.domain.school.User;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity(name = "challenges")
+public class Challenge {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    private String title;
+    private String description;
+
+    @OneToMany(mappedBy = "id.challengeId", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+    private List<Validation> validations;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User creator;
+
+    public static Challenge fromId(UUID id) {
+        return builder().id(id).build();
+    }
+}
