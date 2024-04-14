@@ -20,7 +20,7 @@ jobs:
         run: |
           cd pitangaweb
           npm install
-          npm build
+          npm run build
       - name: Deploy to gh pages
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
