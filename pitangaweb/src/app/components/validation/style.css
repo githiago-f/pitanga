@@ -1,19 +1,7 @@
 .validation-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000000;
-  padding: 3rem;
+  @apply absolute bottom-0 left-0 right-0 z-50 p-12;
 }
 
 .validation-container ol {
-  background-color: white;
-  border-radius: 0.75rem;
-  list-style: none;
-  padding-left: 1rem;
-}
-
-.validation-container ol table {
-  
+  @apply bg-white rounded-xl list-none px-3 pb-2 space-y-1;
 }

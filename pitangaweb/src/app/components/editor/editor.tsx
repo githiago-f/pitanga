@@ -7,7 +7,11 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 
 import { EditorConfigContext } from './editor-config.context';
 
-export const Editor = () => {
+type Props = {
+  customContent?: string;
+}
+
+export const Editor = ({ customContent }: Props) => {
   const context = useContext(EditorConfigContext);
   return (
     <AceEditor
@@ -15,7 +19,7 @@ export const Editor = () => {
       theme="chaos"
       name="code-editor"
       fontSize={context.fontSize}
-      defaultValue={context.fileContent}
+      defaultValue={customContent ?? context.fileContent}
       editorProps={{ $blockScrolling: true }}
       height={context.heigth}
       width={context.width}

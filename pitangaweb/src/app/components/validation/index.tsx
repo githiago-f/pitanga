@@ -1,8 +1,9 @@
+import { ValidationResult } from '../../../domain/problem/solution';
 import './style.css';
 import { ValidationItem } from './validation-item';
 
 type Props = {
-  tests?: any[];
+  validations?: ValidationResult[];
 };
 
 export const ValidationContainer = (props: Props) => {
@@ -10,8 +11,8 @@ export const ValidationContainer = (props: Props) => {
     <div className='validation-container'>
       <ol>
         <li><h3>Validation results</h3></li>
-        {props.tests?.map((test) => (
-          <ValidationItem {...test} />
+        {props.validations?.map((test, i) => (
+          <ValidationItem key={i} {...test} />
         ))}
       </ol>
     </div>
