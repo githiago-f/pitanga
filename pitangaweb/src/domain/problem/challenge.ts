@@ -1,4 +1,13 @@
-import { Validation } from './validation';
+export class ValidationId {
+  readonly id!: number;
+  readonly challengeId!: string;
+}
+
+export class Validation {
+  readonly id!: ValidationId;
+  readonly testInput!: string;
+  readonly expectedOutput!: string;
+}
 
 export class Challenge {
   public readonly id!: string;
