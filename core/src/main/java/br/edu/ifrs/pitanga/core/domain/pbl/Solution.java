@@ -15,6 +15,7 @@ public class Solution {
     private SolutionId id;
     private String code;
     private String language;
+    private String hash;
     @Column(insertable = false, updatable = false)
     private Date createdAt;
     
@@ -24,10 +25,18 @@ public class Solution {
 
     public Boolean compareHash(Solution toCompare) {
         if(toCompare == null) return false;
-        return id.getHash().equals(toCompare.getId().getHash());
+        return getHash().equals(toCompare.getHash());
+    }
+
+    public void setVersion(Solution oldVersion) {
+        Long version = 1l;
+        if(oldVersion != null) {
+            version = oldVersion.id.getVersion() + 1;
+        }
+        id.setVersion(version);
     }
 
     public void setHash(String hash) {
-        id.setHash(hash);
+        this.hash = hash;
     }
 }

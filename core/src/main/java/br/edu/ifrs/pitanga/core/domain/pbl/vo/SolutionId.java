@@ -15,13 +15,13 @@ import jakarta.persistence.Embeddable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SolutionId {
-    private String hash;
+    private Long version;
     @Column(name = "challenge_id")
     private UUID challengeId;
     @Column(name = "submitter_id")
     private Integer submitterId;
 
     public String toString() {
-        return challengeId.toString() + "/" + submitterId + "/" + hash;
+        return challengeId.toString() + "/" + submitterId + "/" + version;
     }
 }
