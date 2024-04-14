@@ -6,6 +6,7 @@ import { ValidationContainer } from '../components/validation';
 import { ToolTray } from '../components/tool-tray';
 import { useCallback, useState } from 'react';
 import { saveSolution } from '../../infra/data/pitanga.rest';
+import { DescriptionModal } from '../components/description-modal';
 
 export const ChallengeEditor = () => {
   const navigation = useNavigation();
@@ -15,6 +16,7 @@ export const ChallengeEditor = () => {
   };
   const [solution, setSolution] = useState(currentSolution);
   const [code, setCode] = useState(solution?.code ?? challenge.baseCode);
+  const [viewDescription, setViewDescription] = useState(false);
 
   if(navigation.state === 'loading') {
     return (
@@ -32,15 +34,29 @@ export const ChallengeEditor = () => {
       challengeId: challenge.id
     });
     setSolution(sol);
-  }, [code, challenge])
+  }, [code, challenge]);
 
   return (
     <>
-      <ToolTray titulo={challenge.title} onExecute={executeCode} />
+      <ToolTray
+        title={challenge.title}
+        onSave={executeCode}
+        onClickViewDoc={() => setViewDescription(!viewDescription)}
+        solutionCodeChanged={code !== solution?.code}
+      />
+      <DescriptionModal
+        show={viewDescription}
+        onClose={() => setViewDescription(false)}
+        title={challenge.title}
+        description={challenge.description}
+      />
       <EditorConfigContext.Provider value={defaultEditorConfig}>
         <Editor customContent={code} onChangeCode={setCode}/>
       </EditorConfigContext.Provider>
-      <ValidationContainer validations={solution?.validationResults}/>
+      <ValidationContainer
+        validations={challenge.validationResults} 
+        results={solution?.validationResults}
+      />
     </>
   );
 }

@@ -5,7 +5,11 @@ export default {
     "./src/**/*.{ts,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        bottom: 'bottom'
+      }
+    },
   },
   plugins: [],
 }

@@ -1,41 +1,46 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SaveButton } from './SaveButton';
+import { Title } from './Title';
+import { ViewDoc } from './ViewDoc';
 
 type Props = {
-    titulo: string;
-    onExecute: () => Promise<void>
-}
+  title: string;
+  onSave: () => Promise<void>;
+  solutionCodeChanged: boolean;
+  onClickViewDoc: () => void;
+};
 
 export const ToolTray = (props: Props) => {
-    const [isRunning, setIsRunning] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-    const executeCode = () => {
-        setIsRunning(true);
-        props.onExecute().then(() => {
-            setIsRunning(false);
-        });
-    };
+  const saveCode = () => {
+    setIsSaving(true);
+    props.onSave().then(() => {
+      setIsSaving(false);
+    });
+  };
 
-    const animation = useMemo(() => (isRunning ? 'animate-spin' : ''), [isRunning]);
-
-    return (
-        <nav className="w-full p-2">
-            <div className="grid grid-cols-6">
-                <Link to={"/"} className="col-span-1 p-1 text-cyan-500 text-center">Voltar</Link>
-                <div className="col-span-4 p-1 text-xl font-bold">
-                    <h2>{props.titulo}</h2>
-                </div>
-                <div className="col-span-1">
-                    <button 
-                        className='bg-green-600 p-2 rounded w-full text-center'
-                        onClick={executeCode}
-                    >
-                        <img 
-                            src="gear-solid.svg" 
-                            className={'h-5 w-full text-center ' + animation}/>
-                    </button>
-                </div>
-            </div>
-        </nav>
-    );
+  return (
+    <nav id="tooltray" className="w-full p-2">
+      <div className="grid grid-cols-6">
+        <Link 
+          to={"/"}
+          className="col-span-1 p-1 text-cyan-500 text-center gap-1">Voltar</Link>
+        <div className="col-span-3 p-1">
+          <Title title={props.title} />
+        </div>
+        <div className="col-span-1">
+          <ViewDoc onClick={props.onClickViewDoc} />
+        </div>
+        <div className="col-span-1">
+          <SaveButton 
+            shouldSave={props.solutionCodeChanged}
+            isSaving={isSaving}
+            saveCode={saveCode} 
+          />
+        </div>
+      </div>
+    </nav>
+  );
 }

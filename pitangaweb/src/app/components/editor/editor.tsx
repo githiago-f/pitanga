@@ -22,7 +22,7 @@ export const Editor = ({ customContent, onChangeCode }: Props) => {
       fontSize={context.fontSize}
       defaultValue={customContent ?? context.fileContent}
       editorProps={{ $blockScrolling: true }}
-      height={context.heigth}
+      height={context.heigth()}
       width={context.width}
       onChange={(value) => onChangeCode(value)}
     />

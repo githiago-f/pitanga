@@ -1,3 +1,5 @@
+import { ValidationResult } from "./solution";
+
 export class ValidationId {
   readonly id!: number;
   readonly challengeId!: string;
@@ -15,9 +17,13 @@ export class Challenge {
   public readonly description!: string;
   public readonly baseCode!: string;
 
-  public readonly validations?: Validation[];
+  public readonly validations!: Validation[];
 
   get link() {
     return `/${this.id}`;
+  }
+
+  get validationResults() {
+    return this.validations.map(ValidationResult.fromValidation);
   }
 }
