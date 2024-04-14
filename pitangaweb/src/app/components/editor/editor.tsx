@@ -9,9 +9,10 @@ import { EditorConfigContext } from './editor-config.context';
 
 type Props = {
   customContent?: string;
+  onChangeCode: (code: string) => void
 }
 
-export const Editor = ({ customContent }: Props) => {
+export const Editor = ({ customContent, onChangeCode }: Props) => {
   const context = useContext(EditorConfigContext);
   return (
     <AceEditor
@@ -23,6 +24,7 @@ export const Editor = ({ customContent }: Props) => {
       editorProps={{ $blockScrolling: true }}
       height={context.heigth}
       width={context.width}
+      onChange={(value) => onChangeCode(value)}
     />
   );
 };
