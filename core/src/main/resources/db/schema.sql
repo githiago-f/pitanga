@@ -29,12 +29,13 @@ CREATE TABLE IF NOT EXISTS validations (
 CREATE SEQUENCE IF NOT EXISTS solutions_version_seq;
 
 CREATE TABLE IF NOT EXISTS solutions (
-    "hash" VARCHAR(32) NOT NULL,
+    "version" BIGINT NOT NULL DEFAULT nextval('solutions_version_seq'),
     "code" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
     "language" VARCHAR(20) NOT NULL,
     challenge_id UUID NOT NULL,
     submitter_id BIGINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    PRIMARY KEY("hash", "challenge_id", "submitter_id"),
+    PRIMARY KEY("version", "challenge_id", "submitter_id"),
     FOREIGN KEY("challenge_id") REFERENCES challenges ON DELETE CASCADE
 );
