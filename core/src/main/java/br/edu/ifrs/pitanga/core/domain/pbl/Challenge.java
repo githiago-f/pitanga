@@ -3,7 +3,6 @@ package br.edu.ifrs.pitanga.core.domain.pbl;
 import java.util.List;
 import java.util.UUID;
 
-import br.edu.ifrs.pitanga.core.domain.school.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,14 +20,13 @@ public class Challenge {
     private UUID id;
     private String title;
     private String description;
+    private String baseCode;
 
-    @OneToMany(mappedBy = "id.challengeId", fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+    @OneToMany(mappedBy = "id.challengeId", fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     private List<Validation> validations;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User creator;
+    private Integer creatorId;
 
-    public static Challenge fromId(UUID id) {
-        return builder().id(id).build();
+    public void setValidations(List<Validation> validations) {
+        this.validations = validations;
     }
 }

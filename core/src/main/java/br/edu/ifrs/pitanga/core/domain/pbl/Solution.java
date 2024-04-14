@@ -1,15 +1,12 @@
 package br.edu.ifrs.pitanga.core.domain.pbl;
 
-import br.edu.ifrs.pitanga.core.domain.pbl.vo.SolutionId;
-import br.edu.ifrs.pitanga.core.domain.school.User;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.util.Date;
 
-@Getter
-@Builder
+import br.edu.ifrs.pitanga.core.domain.pbl.vo.SolutionId;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Builder @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "solutions")
@@ -18,12 +15,19 @@ public class Solution {
     private SolutionId id;
     private String code;
     private String language;
+    @Column(insertable = false, updatable = false)
+    private Date createdAt;
     
     @JoinColumn(insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Challenge challenge;
-    
-    @JoinColumn(insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private User submitter;
+
+    public Boolean compareHash(Solution toCompare) {
+        if(toCompare == null) return false;
+        return id.getHash().equals(toCompare.getId().getHash());
+    }
+
+    public void setHash(String hash) {
+        id.setHash(hash);
+    }
 }
