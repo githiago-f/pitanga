@@ -1,2 +1,2 @@
 export { Challenge } from './challenge';
-export { Validation } from './validation';
+export { Solution } from './solution';
