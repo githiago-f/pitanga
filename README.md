@@ -1,4 +1,9 @@
+<div style="text-align: center;">
+    <img src="./pitangaweb/public/pitanga-icon.svg" alt="Pitanga Icon" style="max-height: 64px;"/>
+    <h3>Pitanga</h3>
+</div>
 
+## Sobre
 
 ## Generate keystore
 
