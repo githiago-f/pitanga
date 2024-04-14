@@ -1,14 +1,18 @@
-# spring.sql.init.data-locations=classpath:db/data.sql
+server:
+  port: 8443
+  ssl:
+    key-store: classpath:certs/keystore.jks
+    key-store-password: ${KEY_STORE_PASSWORD}
 spring:
-    jpa:
-        show-sql: true
-    sql:
-        init:
-            mode: always
-            schema-locations: classpath:db/schema.sql
-    security:
-        oauth2:
-            resourceserver:
-                jwt:
-                    issuer-uri: https://idp.example.com/issuer
-                    
+  main:
+    allow-bean-definition-overriding: true
+  thymeleaf:
+    check-template-location: false
+  application:
+    name: pitanga-core
+  jpa:
+    show-sql: true
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
