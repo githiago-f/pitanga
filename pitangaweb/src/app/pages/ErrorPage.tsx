@@ -1,18 +1,20 @@
-import { AxiosError } from "axios";
-import { useRouteError } from "react-router-dom";
-import { ErrorCodeMap } from "../../infra/error/error-code.map";
-import { useEffect, useState } from "react";
+import { AxiosError } from 'axios';
+import { useRouteError } from 'react-router-dom';
+import { ErrorCodeMap } from '../../infra/error/error-code.map';
+import { useEffect, useState } from 'react';
 
 export const ErrorPage = () => {
     const error = useRouteError();
     const mapper = new ErrorCodeMap();
-    const [message, setMessage] = useState('Desculpe, ocorreu um erro inesperado.')
-    
+    const [message, setMessage] = useState('Desculpe, ocorreu um erro inesperado.');
+
     useEffect(() => {
-        console.error(error);
-        if(error instanceof AxiosError) {
-            setMessage(mapper.fromAxiosError(error));
-        }
+      console.error(error);
+      if(error instanceof AxiosError) {
+        setMessage(mapper.fromAxiosError(error));
+      }
+      document.title = 'Pitanga | ' + message;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error]);
 
     return (
@@ -22,4 +24,4 @@ export const ErrorPage = () => {
             <p className="text-center text-gray-500">{(error as {message: string}).message}</p>
         </div>
     );
-}
+};
