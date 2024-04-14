@@ -62,16 +62,19 @@ public class SubmittedSolutionsHandler {
 
         Solution entity = submission.toEntity();
         entity.setHash(hashCalculator.calculate(entity.getCode()));
+        entity.setVersion(solution);
 
         Challenge challenge = challengesRepository.findById(challengeId)
             .orElseThrow();
         entity.setChallenge(challenge);
+        
         if(!entity.compareHash(solution)) {
             solution = solutionsRepository.save(entity);
         }
 
         SolutionResponse response = SolutionResponse.builder()
             .solutionId(solution.getId())
+            .code(solution.getCode())
             .build();
 
         return response;
