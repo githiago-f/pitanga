@@ -18,10 +18,11 @@ jobs:
           node-version: ${{matrix.node-version}}
       - name: Build
         run: |
+          cd pitangaweb
           npm install
           npm build
       - name: Deploy to gh pages
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           branch: gh-pages
-          folder: dist
+          folder: pitangaweb/dist
