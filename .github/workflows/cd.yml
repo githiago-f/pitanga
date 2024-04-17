@@ -10,6 +10,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: configurations
     strategy:
       matrix:
         node-version: [lts/iron]
@@ -21,10 +22,13 @@ jobs:
           node-version: ${{matrix.node-version}}
       - name: Build
         run: |
-          export PITANGA_API_BASE_URL=${{env.API_BASE_URL}}
+          echo "API Base: $API_BASE_URL"
+          export PITANGA_API_BASE_URL=$API_BASE_URL
           cd pitangaweb
           npm install
           npm run build
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
       - name: Deploy to gh pages
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:

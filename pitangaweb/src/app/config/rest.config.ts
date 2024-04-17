@@ -1,5 +1,5 @@
 const apiBase = import.meta.env.PITANGA_API_BASE_URL;
 
 export const restConfig = {
-  baseURL: apiBase ?? 'https://localhost:8443'
+  baseURL: apiBase && apiBase.trim() !== '' ? apiBase : 'https://localhost:8443'
 };
