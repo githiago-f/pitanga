@@ -18,10 +18,14 @@ export class App extends Component {
       errorElement: <ErrorPage />,
     },
     {
-      path: '/:challengeId',
+      path: '/challenge/:challengeId',
       element: <ChallengeEditor />,
       loader: getChallenge,
       errorElement: <ErrorPage />,
+    },
+    {
+      path: '/create-challenge',
+
     }
   ], { basename });
 

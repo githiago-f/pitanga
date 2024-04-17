@@ -21,7 +21,7 @@ jobs:
           node-version: ${{matrix.node-version}}
       - name: Build
         run: |
-          export API_BASE_URL=${{vars.API_BASE_URL}}
+          export PITANGA_API_BASE_URL=${{env.API_BASE_URL}}
           cd pitangaweb
           npm install
           npm run build

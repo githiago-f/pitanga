@@ -20,7 +20,7 @@ export class Challenge {
   public readonly validations!: Validation[];
 
   get link() {
-    return `/${this.id}`;
+    return `/challenge/${this.id}`;
   }
 
   get validationResults() {

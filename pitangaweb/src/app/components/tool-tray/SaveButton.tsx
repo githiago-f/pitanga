@@ -16,6 +16,6 @@ export const SaveButton = (props: Props) => (
         <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
       </span>
     </span>
-    <img src="save.svg" alt="Salvar" className="h-5 w-full text-center"/>
+    <img src="/pitanga-tcc/save.svg" alt="Salvar" className="h-5 w-full text-center"/>
   </button>
 );

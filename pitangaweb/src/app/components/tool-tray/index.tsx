@@ -26,7 +26,9 @@ export const ToolTray = (props: Props) => {
       <div className="grid grid-cols-6">
         <Link
           to={'/'}
-          className="col-span-1 p-1 text-cyan-500 text-center gap-1">Voltar</Link>
+          className="col-span-1 flex p-2 text-cyan-500 text-center gap-1">
+          <img className='h-5 w-full' src='/pitanga-tcc/back.svg' alt='voltar'/>
+        </Link>
         <div className="col-span-3 p-1">
           <Title title={props.title} />
         </div>

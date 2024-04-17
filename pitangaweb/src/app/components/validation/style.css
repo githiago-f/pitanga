@@ -3,5 +3,14 @@
 }
 
 .validation-container ol {
-  @apply bg-white rounded-xl rounded-tl-none max-h-36 min-h-36 list-none px-3 pb-2 space-y-1 overflow-auto;
+  @apply bg-white
+    rounded-xl
+    rounded-tl-none
+    max-h-80
+    min-h-80
+    list-none
+    px-3
+    pb-2
+    space-y-1
+    overflow-auto;
 }
