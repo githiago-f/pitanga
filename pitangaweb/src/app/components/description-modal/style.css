@@ -1,43 +1,43 @@
 .modal-container {
-    @apply fixed
-        overflow-hidden
-        top-0
-        bottom-0
-        left-0
-        right-0
-        z-50;
+  @apply fixed
+    overflow-hidden
+    top-0
+    bottom-0
+    left-0
+    right-0
+    z-50;
 }
 
 .modal-container-hide {
-    display: none;
-    @apply -z-10;
+  display: none;
+  @apply -z-10;
 }
 
 .close-modal {
-    @apply col-span-1
-        text-center
-        rounded
-        shadow-md
-        border-2
-        border-slate-900;
+  @apply col-span-1
+    text-center
+    rounded
+    shadow-md
+    border-2
+    border-slate-900;
 }
 
 .close-modal:hover {
-    @apply bg-slate-200;
+  @apply bg-slate-200;
 }
 
 .modal-bg {
-    @apply absolute
-        overflow-hidden
-        top-0
-        bottom-0
-        left-0
-        right-0
-        bg-slate-800
-        opacity-35
-        -z-10;
+  @apply absolute
+    overflow-hidden
+    top-0
+    bottom-0
+    left-0
+    right-0
+    bg-slate-800
+    opacity-35
+    -z-10;
 }
 
 .modal {
-    @apply max-w-xs mx-auto bg-white opacity-100 mt-5 rounded-md p-2;
+  @apply max-w-xs mx-auto bg-white opacity-100 mt-5 rounded-md p-2;
 }

@@ -8,12 +8,12 @@ export class SolutionId {
 }
 
 export enum ValidationStatus {
-  PASS = "PASS",
-  FAIL = "FAIL"
+  PASS = 'PASS',
+  FAIL = 'FAIL'
 }
 
 export class ValidationResultId {
-  readonly challengeId!: string
+  readonly challengeId!: string;
   readonly id!: number;
 }
 
@@ -30,7 +30,7 @@ export class ValidationResult {
       input: validation.testInput,
       output: '',
       status: null,
-    } as ValidationResult)
+    } as ValidationResult);
   }
 }
 

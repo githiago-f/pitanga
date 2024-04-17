@@ -1,4 +1,4 @@
-import { ValidationResult } from "./solution";
+import { ValidationResult } from './solution';
 
 export class ValidationId {
   readonly id!: number;

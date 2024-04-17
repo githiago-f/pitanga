@@ -19,6 +19,7 @@ const config = {
     ],
     semi: ['error', 'always'],
     quotes: ['error', 'single'],
+    indent: ['error', 2]
   },
 }
 

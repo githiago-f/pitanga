@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { ValidationResult, ValidationStatus } from "../../../domain/problem/solution";
+import { useState } from 'react';
+import { ValidationResult, ValidationStatus } from '../../../domain/problem/solution';
 
-const NULL_STYLE = 'border-gray-800 bg-gray-500 text-white'
+const NULL_STYLE = 'border-gray-800 bg-gray-500 text-white';
 const FAIL_STYLE = 'border-red-800 bg-red-500 text-white';
 const SUCCESS_STYLE = 'border-lime-800 bg-lime-500 text-lime-50';
 
@@ -17,8 +17,8 @@ export const ValidationItem = (props: ValidationResult) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <li 
-      onClick={() => setIsOpen(!isOpen)} 
+    <li
+      onClick={() => setIsOpen(!isOpen)}
       className={'border rounded p-1 ' + getStyle(props.status)}
     >
       <div className="grid grid-cols-6 pb-1">
