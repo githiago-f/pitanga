@@ -24,8 +24,8 @@ export const ToolTray = (props: Props) => {
   return (
     <nav id="tooltray" className="w-full p-2">
       <div className="grid grid-cols-6">
-        <Link 
-          to={"/"}
+        <Link
+          to={'/'}
           className="col-span-1 p-1 text-cyan-500 text-center gap-1">Voltar</Link>
         <div className="col-span-3 p-1">
           <Title title={props.title} />
@@ -34,13 +34,13 @@ export const ToolTray = (props: Props) => {
           <ViewDoc onClick={props.onClickViewDoc} />
         </div>
         <div className="col-span-1">
-          <SaveButton 
+          <SaveButton
             shouldSave={props.solutionCodeChanged}
             isSaving={isSaving}
-            saveCode={saveCode} 
+            saveCode={saveCode}
           />
         </div>
       </div>
     </nav>
   );
-}
+};

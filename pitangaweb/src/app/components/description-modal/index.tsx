@@ -8,7 +8,7 @@ type Props = {
 };
 
 export const DescriptionModal = (props: Props) => (
-  <div className={props.show ? "modal-container" : "modal-container-hide"}>
+  <div className={props.show ? 'modal-container' : 'modal-container-hide'}>
     <div className='modal-bg'></div>
     <div className='modal'>
       <div className='grid grid-cols-6 border-b-2 p-1'>
@@ -22,4 +22,4 @@ export const DescriptionModal = (props: Props) => (
       </div>
     </div>
   </div>
-)
+);

@@ -1,5 +1,5 @@
-import axios from "axios";
-import { restConfig } from "../../app/config/rest.config";
+import axios from 'axios';
+import { restConfig } from '../../app/config/rest.config';
 
 export const apiBase = axios.create({
     baseURL: restConfig.baseURL,

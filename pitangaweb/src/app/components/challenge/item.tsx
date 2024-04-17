@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { Challenge } from "../../../domain/problem";
+import { Link } from 'react-router-dom';
+import { Challenge } from '../../../domain/problem';
 
 type Props = {challenge: Challenge}
 
@@ -11,8 +11,8 @@ export const ChallengeItem = ({ challenge }: Props) => (
                 <h4 className="rounded text-ellipsis overflow-hidden col-span-2">
                     {challenge.title}
                 </h4>
-                <Link 
-                    className="rounded bg-lime-600 text-white p-1 text-center col-span-1" 
+                <Link
+                    className="rounded bg-lime-600 text-white p-1 text-center col-span-1"
                     to={challenge.link}>Iniciar</Link>
             </div>
         </div>

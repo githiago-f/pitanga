@@ -1,8 +1,8 @@
-import { Challenge } from "../../domain/problem";
-import { plainToInstance } from "class-transformer";
-import { apiBase } from "./base";
-import { Params, redirect } from "react-router-dom";
-import { Solution } from "../../domain/problem/solution";
+import { Challenge } from '../../domain/problem';
+import { plainToInstance } from 'class-transformer';
+import { apiBase } from './base';
+import { Params, redirect } from 'react-router-dom';
+import { Solution } from '../../domain/problem/solution';
 
 export async function listChallenges() {
     const challengesRaw = await apiBase.get<Challenge[]>('/challenges');
@@ -17,8 +17,8 @@ export async function getChallenge({ params }: {params: Params}) {
     }
     const solutionRaw = await apiBase.get<Solution>(url + '/solutions');
     const result = {
-        challenge: plainToInstance(Challenge, challengeRaw.data), 
-        solution: undefined 
+        challenge: plainToInstance(Challenge, challengeRaw.data),
+        solution: undefined
     } as { challenge: Challenge, solution?: Solution };
     if(solutionRaw.status === 200) {
         result.solution = plainToInstance(Solution, solutionRaw.data);

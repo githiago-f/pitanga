@@ -1,4 +1,3 @@
-import { Editor, EditorConfigContext, defaultEditorConfig } from '../components/editor';
 import { Challenge } from '../../domain/problem';
 import { useLoaderData } from 'react-router-dom';
 import { Solution } from '../../domain/problem/solution';
@@ -7,6 +6,8 @@ import { ToolTray } from '../components/tool-tray';
 import { useCallback, useEffect, useState } from 'react';
 import { saveSolution } from '../../infra/data/pitanga.rest';
 import { DescriptionModal } from '../components/description-modal';
+import { EditorConfigContext, defaultEditorConfig } from '../components/editor/editor-config.context';
+import { Editor } from '../components/editor/editor';
 
 export const ChallengeEditor = () => {
   const {challenge, solution: currentSolution} = useLoaderData() as {

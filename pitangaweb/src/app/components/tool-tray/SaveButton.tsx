@@ -1,5 +1,5 @@
 type Props = {
-  isSaving: boolean; 
+  isSaving: boolean;
   saveCode: () => void;
   shouldSave: boolean;
 };
@@ -18,4 +18,4 @@ export const SaveButton = (props: Props) => (
     </span>
     <img src="save.svg" alt="Salvar" className="h-5 w-full text-center"/>
   </button>
-)
+);

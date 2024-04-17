@@ -6,7 +6,7 @@ export const defaultEditorConfig = {
     '{\n\t\t// Sua solução aqui\n\t}\n}\n',
   width: '100vw',
   heigth: () => {
-    const tray = document.getElementById("tooltray");
+    const tray = document.getElementById('tooltray');
     const height = (tray?.style.height ?? '52px');
     return `calc(100vh - ${height})`;
   }
