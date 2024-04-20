@@ -10,9 +10,10 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 public class ApiWebConfig implements WebFluxConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/challenges/**")
-            .allowedOrigins("*")
+        registry.addMapping("/**")
+            .allowedOrigins("https://githiago-f.github.io/", "http://localhost:3000/")
             .allowedMethods("*")
+            .allowCredentials(true)
             .maxAge(3600);
     }
 }

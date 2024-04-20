@@ -5,6 +5,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { ChallengeEditor } from './app/pages/ChallengeEditor';
 import { getChallenge, listChallenges } from './infra/data/pitanga.rest';
 import { ErrorPage } from './app/pages/ErrorPage';
+import { CreateChallenge } from './app/pages/CreateChallenge';
 
 const basename = import.meta.env.BASE_URL ?? '/pitanga-tcc';
 
@@ -25,7 +26,7 @@ export class App extends Component {
     },
     {
       path: '/create-challenge',
-
+      element: <CreateChallenge />,
     }
   ], { basename });
 

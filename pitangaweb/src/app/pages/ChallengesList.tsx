@@ -12,7 +12,7 @@ export const ChallengesList = () => {
   }, []);
 
   return (
-    <div>
+    <div className='px-2'>
       {challenges?.map(challenge =>
         <ChallengeItem key={challenge.id} challenge={challenge} />
       )}

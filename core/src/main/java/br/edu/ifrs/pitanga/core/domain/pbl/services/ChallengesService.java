@@ -5,10 +5,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
 import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
+import br.edu.ifrs.pitanga.core.app.http.dto.ChallengePageable;
 import br.edu.ifrs.pitanga.core.app.http.dto.ChallengeRequest;
 import br.edu.ifrs.pitanga.core.domain.repositories.ChallengesRepository;
 import br.edu.ifrs.pitanga.core.domain.repositories.ValidationsRepository;
@@ -20,8 +23,8 @@ public class ChallengesService {
     private final ChallengesRepository challengesRepository;
     private final ValidationsRepository validationsRepository;
 
-    public Iterable<Challenge> handle() {
-        return challengesRepository.findAll();
+    public Page<Challenge> handle(ChallengePageable pageable) {
+        return challengesRepository.findAll(pageable.toPageable());
     }
 
     public Optional<Challenge> handle(UUID id) {

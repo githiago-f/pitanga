@@ -3,10 +3,14 @@ import { plainToInstance } from 'class-transformer';
 import { apiBase } from './base';
 import { Params, redirect } from 'react-router-dom';
 import { Solution } from '../../domain/problem/solution';
+import { Page } from './page.dto';
 
 export async function listChallenges() {
-  const challengesRaw = await apiBase.get<Challenge[]>('/challenges');
-  return challengesRaw.data.map(c => plainToInstance(Challenge, c));
+  const challengesRaw = await apiBase.get<Page<Challenge[]>>('/challenges');
+  if(!challengesRaw.data?.content) {
+    throw new Error('Could not load page');
+  }
+  return challengesRaw.data?.content.map(c => plainToInstance(Challenge, c));
 }
 
 export async function getChallenge({ params }: {params: Params}) {

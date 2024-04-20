@@ -5,6 +5,14 @@
 
 ## Sobre
 
+Pitanga é um projeto destinado a auxiliar o aprendizado de programação 
+
+## Run ngrok
+
+```bash
+ngrok http --domain=distinct-serval-known.ngrok-free.app https://localhost:8443
+```
+
 ## Generate keystore
 
 https://stackoverflow.com/questions/50235957/how-to-configure-spring-boot-2-webflux-to-use-ssl
