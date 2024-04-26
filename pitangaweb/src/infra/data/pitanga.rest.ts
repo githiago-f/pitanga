@@ -30,6 +30,18 @@ export async function getChallenge({ params }: {params: Params}) {
   return result;
 }
 
+type ChallengeSaveCommand = {
+  title: string;
+  description: string;
+  baseCode: string;
+  validations: { input: string; output: string; }[];
+};
+
+export async function saveChallenge(props: ChallengeSaveCommand) {
+  const res = await apiBase.post('/challenges', {...props, creatorId: 2});
+  console.log(res.data);
+}
+
 type SaveCommand = { code: string, language: string, challengeId: string};
 
 export async function saveSolution(params: SaveCommand) {
