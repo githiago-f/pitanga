@@ -5,7 +5,9 @@ import 'react-quill/dist/quill.snow.css';
 import { defaultEditorConfig } from '../components/editor/editor-config.context';
 
 import { saveChallenge } from '../../infra/data/pitanga.rest';
+import { ValidationEditor } from '../components/validation/validation-editor';
 import { ChallengeEditor } from '../components/editor/challenge-editor';
+import { ValidationFormField, validationFactory } from '../../infra/utils/validation-factory';
 
 export const CreateChallenge = () => {
   const [baseCode, setBaseCode] = useState(defaultEditorConfig.fileContent);
@@ -17,15 +19,17 @@ export const CreateChallenge = () => {
 
   const onSubmitForm = useCallback((event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { title } = event.currentTarget.elements as unknown as {
+    const elements = event.currentTarget.elements as unknown as {
       title: HTMLInputElement;
-    };
-    console.log(event);
+    } & ValidationFormField;
+
+    const validations = validationFactory(elements);
+
     saveChallenge({
-      title: title.value,
+      title: elements.title.value,
       baseCode,
       description,
-      validations: []
+      validations: validations
     });
   }, [description, baseCode]);
 
@@ -51,15 +55,18 @@ export const CreateChallenge = () => {
           id="title"
           placeholder='Titulo'
           aria-label='Titulo do desafio'
+          required
+          minLength={5}
         />
         <h3 className='p-2 text-lg font-bold'>Descrição</h3>
-        <Quill theme='snow' value={description} onChange={setDescription} />
-        <h3 className='p-2 text-lg font-bold'>Código base</h3>
+        <Quill
+          placeholder='Descrição'
+          theme='snow'
+          value={description}
+          onChange={setDescription}
+        />
+        <ValidationEditor />
         <ChallengeEditor baseCode={baseCode} setBaseCode={setBaseCode} />
-        <hr/>
-        <div>
-
-        </div>
         <div className='space-x-2 flex justify-end'>
           <button
             className='border rounded border-neutral-800 p-3 bg-slate-500 text-white'

@@ -4,13 +4,15 @@ import 'ace-builds/src-noconflict/mode-java';
 import 'ace-builds/src-noconflict/theme-chaos';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import { defaultEditorConfig } from './editor-config.context';
+import { Tooltip } from '../tooltip';
+import { useState } from 'react';
 
 type Props = {
   baseCode: string;
   setBaseCode: (val: string) => void
 };
 
-export const ChallengeEditor = ({ baseCode, setBaseCode }: Props) => (
+const Editor = ({ baseCode, setBaseCode }: Props) => (
   <AceEditor
     mode="java"
     theme="chaos"
@@ -23,3 +25,23 @@ export const ChallengeEditor = ({ baseCode, setBaseCode }: Props) => (
     onChange={(value) => setBaseCode(value)}
   />
 );
+
+export const ChallengeEditor = (props: Props) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div>
+      <div onClick={() => setIsOpen(!isOpen)} className='flex items-center'>
+        <h3 className='p-2 text-lg font-bold'>Código base</h3>
+        <Tooltip message="Não altere o nome da classe publica, ela será a classe main."/>
+      </div>
+      <hr/>
+      <div hidden={!isOpen}>
+        <Editor
+          baseCode={props.baseCode}
+          setBaseCode={props.setBaseCode}
+        />
+      </div>
+    </div>
+  );
+};

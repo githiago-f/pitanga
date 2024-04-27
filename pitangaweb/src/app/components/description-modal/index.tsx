@@ -1,4 +1,5 @@
 import './style.css';
+import 'react-quill/dist/quill.snow.css';
 
 type Props = {
   title: string;
@@ -17,9 +18,7 @@ export const DescriptionModal = (props: Props) => (
           <img src='/pitanga-tcc/close.svg' alt='close' className='w-8 mx-auto h-8'/>
         </button>
       </div>
-      <div>
-        <p>{props.description}</p>
-      </div>
+      <div dangerouslySetInnerHTML={{ __html: props.description }} />
     </div>
   </div>
 );
