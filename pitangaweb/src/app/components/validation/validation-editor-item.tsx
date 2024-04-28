@@ -18,8 +18,6 @@ export const ValidationEditorItem: FC<Props> = (props) => (
       <textarea
         className='p-1 rounded border'
         rows={1}
-        required
-        minLength={1}
         name={'input-' + props.index}
         id={'input-' + props.index}
         placeholder="Input de dados"

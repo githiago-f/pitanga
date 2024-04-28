@@ -3,7 +3,7 @@ import { Component } from 'react';
 import { ChallengesList } from './app/pages/ChallengesList';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { ChallengeEditor } from './app/pages/ChallengeEditor';
-import { getChallenge, listChallenges } from './infra/data/pitanga.rest';
+import { getChallengeSolution, listChallenges } from './infra/data/pitanga.rest';
 import { ErrorPage } from './app/pages/ErrorPage';
 import { CreateChallenge } from './app/pages/CreateChallenge';
 
@@ -21,7 +21,7 @@ export class App extends Component {
     {
       path: '/challenge/:challengeId',
       element: <ChallengeEditor />,
-      loader: getChallenge,
+      loader: getChallengeSolution,
       errorElement: <ErrorPage />,
     },
     {

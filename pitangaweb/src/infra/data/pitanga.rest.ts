@@ -13,7 +13,7 @@ export async function listChallenges() {
   return challengesRaw.data?.content.map(c => plainToInstance(Challenge, c));
 }
 
-export async function getChallenge({ params }: {params: Params}) {
+export async function getChallengeSolution({ params }: {params: Params}) {
   const url = `/challenges/${params.challengeId}`;
   const challengeRaw = await apiBase.get<Challenge>(url);
   if(challengeRaw.status === 404) {
@@ -38,8 +38,9 @@ type ChallengeSaveCommand = {
 };
 
 export async function saveChallenge(props: ChallengeSaveCommand) {
-  const res = await apiBase.post('/challenges', {...props, creatorId: 2});
+  const res = await apiBase.post<Challenge>('/challenges', {...props, creatorId: 2});
   console.log(res.data);
+  return plainToInstance(Challenge, res.data);
 }
 
 type SaveCommand = { code: string, language: string, challengeId: string};

@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { default as Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { defaultEditorConfig } from '../components/editor/editor-config.context';
@@ -10,6 +10,7 @@ import { ChallengeEditor } from '../components/editor/challenge-editor';
 import { ValidationFormField, validationFactory } from '../../infra/utils/validation-factory';
 
 export const CreateChallenge = () => {
+  const navigate = useNavigate();
   const [baseCode, setBaseCode] = useState(defaultEditorConfig.fileContent);
   const [description, setDescription] = useState('');
 
@@ -21,17 +22,24 @@ export const CreateChallenge = () => {
     event.preventDefault();
     const elements = event.currentTarget.elements as unknown as {
       title: HTMLInputElement;
+      level: HTMLSelectElement;
     } & ValidationFormField;
 
     const validations = validationFactory(elements);
 
-    saveChallenge({
+    const body = {
       title: elements.title.value,
       baseCode,
       description,
+      level: elements.level.value,
       validations: validations
-    });
-  }, [description, baseCode]);
+    };
+
+    saveChallenge(body)
+      .then((res) => {
+        navigate('/challenge/' + res.id);
+      });
+  }, [description, baseCode, navigate]);
 
   return (
     <div className='max-w-2xl mx-auto'>
@@ -47,7 +55,7 @@ export const CreateChallenge = () => {
           </h2>
         </div>
       </nav>
-      <form className='p-3 space-y-3' onSubmit={onSubmitForm}>
+      <form id='challenge' className='p-3 space-y-3' onSubmit={onSubmitForm}>
         <input
           className='p-2 rounded-md text-lg border border-slate-800 w-full'
           type="text"
@@ -65,6 +73,15 @@ export const CreateChallenge = () => {
           value={description}
           onChange={setDescription}
         />
+        <div className='flex'>
+          <h3 className='p-2 text-lg font-bold'>Nível: </h3>
+          <select name="level" id="level">
+            <option value="EASY">Fácil</option>
+            <option value="MEDIUM">Médio</option>
+            <option value="HARD">Dificil</option>
+            <option value="PRO">PRO</option>
+          </select>
+        </div>
         <ValidationEditor />
         <ChallengeEditor baseCode={baseCode} setBaseCode={setBaseCode} />
         <div className='space-x-2 flex justify-end pb-16'>
