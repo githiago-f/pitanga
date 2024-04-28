@@ -20,8 +20,8 @@ const Editor = ({ baseCode, setBaseCode }: Props) => (
     fontSize={defaultEditorConfig.fontSize}
     defaultValue={baseCode}
     editorProps={{ $blockScrolling: true }}
-    height={`calc(${defaultEditorConfig.heigth()} - 5rem)`}
-    width={`calc(${defaultEditorConfig.width} - 2.75rem)`}
+    height="calc(100vh - 5rem)"
+    width={`calc(${screen.width > 672 ? 672 : screen.width}px - 1.5rem)`}
     onChange={(value) => setBaseCode(value)}
   />
 );
@@ -36,7 +36,7 @@ export const ChallengeEditor = (props: Props) => {
         <Tooltip message="Não altere o nome da classe publica, ela será a classe main."/>
       </div>
       <hr/>
-      <div hidden={!isOpen}>
+      <div className='transition-height' hidden={!isOpen}>
         <Editor
           baseCode={props.baseCode}
           setBaseCode={props.setBaseCode}

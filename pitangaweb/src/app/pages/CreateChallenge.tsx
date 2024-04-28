@@ -34,7 +34,7 @@ export const CreateChallenge = () => {
   }, [description, baseCode]);
 
   return (
-    <>
+    <div className='max-w-2xl mx-auto'>
       <nav className="w-full p-2">
         <div className="grid grid-cols-6">
           <Link
@@ -67,12 +67,12 @@ export const CreateChallenge = () => {
         />
         <ValidationEditor />
         <ChallengeEditor baseCode={baseCode} setBaseCode={setBaseCode} />
-        <div className='space-x-2 flex justify-end'>
+        <div className='space-x-2 flex justify-end pb-16'>
           <button
-            className='border rounded border-neutral-800 p-3 bg-slate-500 text-white'
+            className='border rounded border-rose-800 p-3 bg-rose-500 text-white'
             type='submit'>Enviar</button>
         </div>
       </form>
-    </>
+    </div>
   );
 };

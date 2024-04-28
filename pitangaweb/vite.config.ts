@@ -9,5 +9,5 @@ export default defineConfig({
     port: 3000,
   },
   base: '/pitanga-tcc',
-  envPrefix: 'PITANGA_'
+  envPrefix: 'PITANGA_',
 });
