@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
 import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
+import br.edu.ifrs.pitanga.core.domain.pbl.vo.ChallengeLevel;
 import br.edu.ifrs.pitanga.core.domain.pbl.vo.ValidationId;
 
 record ValidationDTO(String input, String output) {}
@@ -15,6 +16,7 @@ public record ChallengeRequest(
     String title,
     String description,
     String baseCode,
+    String level,
     List<ValidationDTO> validations
 ) {
     public List<Validation> transformValidations(UUID challengeId) {
@@ -41,6 +43,7 @@ public record ChallengeRequest(
             .description(description())
             .creatorId(creatorId())
             .baseCode(baseCode())
+            .level(ChallengeLevel.valueOf(level()))
             .build();
     }
 }

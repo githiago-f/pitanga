@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
@@ -27,7 +26,7 @@ public class ChallengesService {
         return challengesRepository.findAll(pageable.toPageable());
     }
 
-    public Optional<Challenge> handle(UUID id) {
+    public Optional<Challenge> findById(UUID id) {
         return challengesRepository.findById(id);
     }
 

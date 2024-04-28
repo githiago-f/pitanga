@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
@@ -32,12 +33,17 @@ public class ChallengesController {
     }
 
     @GetMapping("/{challengeId}")
-    public ResponseEntity<Challenge> getMethodName(@PathVariable UUID challengeId) {
-        return challengesService.handle(challengeId)
+    public ResponseEntity<Challenge> getById(@PathVariable UUID challengeId) {
+        return challengesService.findById(challengeId)
             .map(ResponseEntity.ok()::body)
             .orElse(ResponseEntity.notFound().build());
     }
 
+    @PatchMapping("/{challengeId}")
+    public ResponseEntity<Challenge> updateById(
+        @PathVariable UUID challengeId, @RequestBody ChallengeRequest request) {
+        return ResponseEntity.accepted().build();
+    }
 
     @PostMapping()
     public Challenge createChallenge(@RequestBody ChallengeRequest request) {

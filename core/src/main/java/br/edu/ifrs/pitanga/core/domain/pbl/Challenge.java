@@ -3,6 +3,7 @@ package br.edu.ifrs.pitanga.core.domain.pbl;
 import java.util.List;
 import java.util.UUID;
 
+import br.edu.ifrs.pitanga.core.domain.pbl.vo.ChallengeLevel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,9 @@ public class Challenge {
     private String title;
     private String description;
     private String baseCode;
+
+    @Enumerated(EnumType.STRING)
+    private ChallengeLevel level;
 
     @OneToMany(mappedBy = "id.challengeId", fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     private List<Validation> validations;

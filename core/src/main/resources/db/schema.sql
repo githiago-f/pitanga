@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS challenges (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
     "description" TEXT NOT NULL,
+    "level" VARCHAR(255) NOT NULL,
     "base_code" TEXT DEFAULT 'public class Main {\n\tpublic static void main(String[] args) {\n\t\t// Solução\n\t}\n}',
     creator_id BIGINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
