@@ -1,2 +1,7 @@
 **/target
 **/node_modules
+**/*.jks
+**/*.pub
+**/*.pem
+**/*.cert
+**/*.key

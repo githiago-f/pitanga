@@ -1,0 +1,45 @@
+server:
+  port: 8444
+  ssl:
+    key-store: classpath:certs/keystore.jks
+    key-store-password: ${KEY_STORE_PASSWORD}
+spring:
+  application:
+    name: auth
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          postman-test:
+            registration:
+              client-id: "postman"
+              client-secret: ${POSTMAN_SECRET}
+              client-authentication-methods:
+                - "client_secret_basic"
+              authorization-grant-types:
+                - "authorization_code"
+                - "refresh_token"
+              redirect-uris:
+                - https://oauth.pstmn.io/v1/callback
+              post-logout-redirect-uris:
+                - "/unknown"
+              scopes:
+                - "openid"
+                - "profile"
+            require-authorization-consent: true
+          oidc-client:
+            registration:
+              client-id: "pitangaweb"
+              client-authentication-methods:
+                - "client_secret_basic"
+              authorization-grant-types:
+                - "authorization_code"
+                - "refresh_token"
+              redirect-uris:
+                - "http://localhost:3000/pitanga-tcc/login/oauth2/code"
+              post-logout-redirect-uris:
+                - "http://localhost:3000/pitanga-tcc"
+              scopes:
+                - "openid"
+                - "profile"
+            require-authorization-consent: true

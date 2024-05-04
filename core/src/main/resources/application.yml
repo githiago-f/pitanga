@@ -8,11 +8,14 @@ spring:
     allow-bean-definition-overriding: true
   thymeleaf:
     check-template-location: false
-  application:
-    name: pitanga-core
   jpa:
     show-sql: true
   sql:
     init:
       mode: always
       schema-locations: classpath:db/schema.sql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://localhost:8444
