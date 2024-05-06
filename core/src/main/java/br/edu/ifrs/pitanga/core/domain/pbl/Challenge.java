@@ -28,7 +28,7 @@ public class Challenge {
 
     @OneToMany(mappedBy = "id.challengeId", fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     private List<Validation> validations;
-    private Integer creatorId;
+    private String creatorId;
 
     public void setValidations(List<Validation> validations) {
         this.validations = validations;

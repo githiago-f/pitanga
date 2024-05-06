@@ -9,7 +9,7 @@ public record SaveSolutionCommand(
     String code,
     String language,
     UUID challengeId,
-    Integer submitterId
+    String submitterId
 ) {
     public Solution toEntity() {
         SolutionId id = SolutionId.builder()

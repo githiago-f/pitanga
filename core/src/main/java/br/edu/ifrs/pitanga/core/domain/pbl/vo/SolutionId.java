@@ -19,7 +19,7 @@ public class SolutionId {
     @Column(name = "challenge_id")
     private UUID challengeId;
     @Column(name = "submitter_id")
-    private Integer submitterId;
+    private String submitterId;
 
     public String toString() {
         return challengeId.toString() + "/" + submitterId + "/" + version;

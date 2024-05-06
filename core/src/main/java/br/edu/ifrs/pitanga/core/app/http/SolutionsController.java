@@ -10,6 +10,7 @@ import br.edu.ifrs.pitanga.core.domain.pbl.services.SubmittedSolutionsHandler;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SearchSolutionCommand;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveSolutionCommand;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +28,8 @@ public class SolutionsController {
     private final SubmittedSolutionsHandler solutionsService;
 
     @GetMapping()
-    public Mono<ResponseEntity<SolutionResponse>> viewSolution(@PathVariable UUID challengeId) {
-        SearchSolutionCommand command = new SearchSolutionCommand(1, challengeId);
+    public Mono<ResponseEntity<SolutionResponse>> viewSolution(Authentication user, @PathVariable UUID challengeId) {
+        SearchSolutionCommand command = new SearchSolutionCommand(user.getName(), challengeId);
         return solutionsService.viewByVersion(command)
             .map(ResponseEntity.ok()::body)
             .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -36,6 +37,7 @@ public class SolutionsController {
 
     @PutMapping
     public SolutionResponse trySolution(
+        Authentication user,
         @PathVariable UUID challengeId,
         @RequestBody SolutionRequest solution
     ) {
@@ -43,7 +45,7 @@ public class SolutionsController {
             solution.code(),
             solution.language(),
             challengeId,
-            1
+            user.getName()
         );
         return solutionsService.handle(command);
     }

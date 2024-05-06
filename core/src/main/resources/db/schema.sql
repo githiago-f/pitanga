@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS challenges (
     "description" TEXT NOT NULL,
     "level" VARCHAR(255) NOT NULL,
     "base_code" TEXT DEFAULT 'public class Main {\n\tpublic static void main(String[] args) {\n\t\t// Solução\n\t}\n}',
-    creator_id BIGINT NOT NULL,
+    creator_id VARCHAR(64) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS solutions (
     "hash" TEXT NOT NULL,
     "language" VARCHAR(20) NOT NULL,
     challenge_id UUID NOT NULL,
-    submitter_id BIGINT NOT NULL,
+    submitter_id VARCHAR(64) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY("version", "challenge_id", "submitter_id"),
     FOREIGN KEY("challenge_id") REFERENCES challenges ON DELETE CASCADE

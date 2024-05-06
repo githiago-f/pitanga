@@ -12,7 +12,6 @@ import br.edu.ifrs.pitanga.core.domain.pbl.vo.ValidationId;
 record ValidationDTO(String input, String output) {}
 
 public record ChallengeRequest(
-    Integer creatorId,
     String title,
     String description,
     String baseCode,
@@ -37,11 +36,11 @@ public record ChallengeRequest(
         return aValidations;
     }
 
-    public Challenge toEntity() {
+    public Challenge toEntity(String userId) {
         return Challenge.builder()
             .title(title())
             .description(description())
-            .creatorId(creatorId())
+            .creatorId(userId)
             .baseCode(baseCode())
             .level(ChallengeLevel.valueOf(level()))
             .build();

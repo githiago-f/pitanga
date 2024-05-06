@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
 import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
+import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveChallengeCommand;
 import br.edu.ifrs.pitanga.core.app.http.dto.ChallengePageable;
-import br.edu.ifrs.pitanga.core.app.http.dto.ChallengeRequest;
 import br.edu.ifrs.pitanga.core.domain.repositories.ChallengesRepository;
 import br.edu.ifrs.pitanga.core.domain.repositories.ValidationsRepository;
 import lombok.AllArgsConstructor;
@@ -30,9 +30,10 @@ public class ChallengesService {
         return challengesRepository.findById(id);
     }
 
-    public Challenge handle(ChallengeRequest command) {
+    public Challenge handle(SaveChallengeCommand command) {
         Challenge challenge = challengesRepository.save(command.toEntity());
-        List<Validation> validations = command.transformValidations(challenge.getId())
+        List<Validation> validations = command.request()
+            .transformValidations(challenge.getId())
             .stream().map(validationsRepository::save)
             .collect(Collectors.toList());
         challenge.setValidations(validations);

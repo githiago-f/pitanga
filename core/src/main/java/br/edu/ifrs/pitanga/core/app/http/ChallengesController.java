@@ -7,6 +7,7 @@ import br.edu.ifrs.pitanga.core.app.http.dto.ChallengePageable;
 import br.edu.ifrs.pitanga.core.app.http.dto.ChallengeRequest;
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.ChallengesService;
+import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveChallengeCommand;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +47,8 @@ public class ChallengesController {
     }
 
     @PostMapping()
-    public Challenge createChallenge(@RequestBody ChallengeRequest request) {
-        return challengesService.handle(request);
+    public Challenge createChallenge(Authentication user, @RequestBody ChallengeRequest request) {
+        SaveChallengeCommand saveCommand = new SaveChallengeCommand(user, request);
+        return challengesService.handle(saveCommand);
     }
 }
