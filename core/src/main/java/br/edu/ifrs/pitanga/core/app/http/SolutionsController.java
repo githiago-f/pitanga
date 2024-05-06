@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 import br.edu.ifrs.pitanga.core.app.http.dto.SolutionRequest;
 import br.edu.ifrs.pitanga.core.app.http.dto.SolutionResponse;
-import br.edu.ifrs.pitanga.core.domain.pbl.Solution;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.SubmittedSolutionsHandler;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SearchSolutionCommand;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveSolutionCommand;

@@ -1,7 +1,6 @@
 package br.edu.ifrs.pitanga.core.app.http;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifrs.pitanga.core.app.http.dto.ChallengePageable;

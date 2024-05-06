@@ -20,6 +20,7 @@ public class LocalCommandRunner implements CommandRunner {
     private String runProgram(File dir) throws IOException {
         log.info("Executing solution on dir {}", dir.getPath());
         File inputFile = new File(dir.getPath() + "/input");
+        @SuppressWarnings("static-access")
         Process process = new ProcessBuilder()
             .command("bash", "-c", "javac Solution.java && java Solution")
             .directory(dir)
@@ -41,7 +42,7 @@ public class LocalCommandRunner implements CommandRunner {
         return buffer.toString();
     }
 
-    private File createTempFile(Solution solution, String input) 
+    private File createTempFile(Solution solution, String input)
         throws IOException {
         String prefix = solution.getId().toString();
         File dir = new File(ROOT_PATH + "/" + prefix);
@@ -50,7 +51,7 @@ public class LocalCommandRunner implements CommandRunner {
         log.debug("{} created", dir.getPath());
         Path filePath = path.resolve("Solution.java");
         Path inputPath = path.resolve("input");
-        
+
         if(Files.exists(inputPath)) {
             Files.delete(inputPath);
         }
@@ -66,7 +67,7 @@ public class LocalCommandRunner implements CommandRunner {
             Files.createFile(filePath);
             log.debug("{} created", filePath.toString());
         }
-        
+
         byte[] bytes = solution.getCode().getBytes();
         log.debug("Writing code to solution file {}", filePath.toString());
         Files.write(filePath, bytes, StandardOpenOption.WRITE);
