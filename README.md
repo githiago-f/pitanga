@@ -18,11 +18,9 @@ ngrok http --domain=distinct-serval-known.ngrok-free.app https://localhost:8443
 https://stackoverflow.com/questions/50235957/how-to-configure-spring-boot-2-webflux-to-use-ssl
 
 ```bash
-keytool -genkeypair -keyalg RSA -keystore src/main/resources/certs/keystore.jks
+openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
 
-openssl req  -nodes -new -x509  -keyout server.key -out server.cert
-
-openssl rsa -pubout -in private.pem -out public.pem
+keytool -importcert -cacerts -file ./core/src/main/resources/certs/certificate.pem -alias pitanga -storepass $STORE_PASS
 ```
 
 ## Isolate java processes

@@ -1,8 +1,13 @@
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
 server:
   port: 8443
   ssl:
-    key-store: classpath:certs/keystore.jks
-    key-store-password: ${KEY_STORE_PASSWORD}
+    certificate: classpath:certs/certificate.pem
+    certificate-private-key: classpath:certs/key.pem
 spring:
   main:
     allow-bean-definition-overriding: true
@@ -18,4 +23,5 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://localhost:8444
+          issuer-uri: https://localhost:8444/realms/master
+          jwk-set-uri: https://localhost:8444/realms/master/protocol/openid-connect/certs

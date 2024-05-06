@@ -6,7 +6,8 @@ import { ChallengeEditor } from './app/pages/ChallengeEditor';
 import { getChallengeSolution, listChallenges } from './infra/data/pitanga.rest';
 import { ErrorPage } from './app/pages/ErrorPage';
 import { CreateChallenge } from './app/pages/CreateChallenge';
-import { loginAction } from './app/actions/login-action';
+import { Auth } from './app/config/auth.config';
+import { loginAction, requestAuthToken } from './app/actions/login-action';
 
 const basename = import.meta.env.BASE_URL ?? '/pitanga-tcc';
 
@@ -17,7 +18,7 @@ export class App extends Component {
       path: '/',
       element: <ChallengesList />,
       loader: listChallenges,
-      errorElement: <ErrorPage />
+      errorElement: <ErrorPage />,
     },
     {
       path: '/challenge/:challengeId',
@@ -28,6 +29,11 @@ export class App extends Component {
     {
       path: '/create-challenge',
       element: <CreateChallenge />,
+    },
+    {
+      path: Auth.client.CALLBACK_ENDPOINT,
+      element: <div></div>,
+      loader: requestAuthToken
     }
   ], { basename });
 

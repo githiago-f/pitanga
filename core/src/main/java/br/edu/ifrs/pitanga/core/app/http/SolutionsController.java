@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
 @RestController
 @AllArgsConstructor
 @RequestMapping("/challenges/{challengeId}/solutions")

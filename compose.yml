@@ -15,8 +15,8 @@ services:
       dockerfile: ./docker/keycloak.Dockerfile
       context: .
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=changeme
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: changeme
     ports:
       - "8444:8443"
     networks:

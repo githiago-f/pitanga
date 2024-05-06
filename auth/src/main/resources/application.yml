@@ -3,6 +3,11 @@ server:
   ssl:
     key-store: classpath:certs/keystore.jks
     key-store-password: ${KEY_STORE_PASSWORD}
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
 spring:
   application:
     name: auth
@@ -13,7 +18,7 @@ spring:
           postman-test:
             registration:
               client-id: "postman"
-              client-secret: ${POSTMAN_SECRET}
+              client-secret: "postman"
               client-authentication-methods:
                 - "client_secret_basic"
               authorization-grant-types:
@@ -36,7 +41,7 @@ spring:
                 - "authorization_code"
                 - "refresh_token"
               redirect-uris:
-                - "http://localhost:3000/pitanga-tcc/login/oauth2/code"
+                - http://localhost:3000/pitanga-tcc/login/oauth2/code
               post-logout-redirect-uris:
                 - "http://localhost:3000/pitanga-tcc"
               scopes:

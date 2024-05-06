@@ -1,10 +1,20 @@
 const env = import.meta.env;
 
 export const Auth = {
-  CALLBACK_ENDPOINT: '/login/oauth2/code',
-  AUTH_CLIENT: env.AUTH_CLIENT ?? 'pitangaweb',
-  AUTH_SERVICE: env.AUTH_URL ?? 'https://localhost:8444',
-  AUTH_ENDPOINT: env.AUTH_ENDPOINT ?? '/oauth2/authorize',
-  CLIENT_DOMAIN: env.APP_URL ?? 'http://localhost:3000/pitanga-tcc',
-  AUTH_SCOPES: env.AUTH_SCOPES ?? 'profile'
+  auth_service: {
+    CLIENT: env.AUTH_CLIENT ?? 'pitanga',
+    AUTHORIZE: env.AUTHORIZE_URL ?? 'https://localhost:8444/realms/master/protocol/openid-connect/auth',
+    TOKEN: env.TOKEN_URL ?? 'https://localhost:8444/realms/master/protocol/openid-connect/token',
+    SCOPES: (env.AUTH_SCOPES as string ?? 'profile').split(',').map(i => i.trim()),
+  },
+  client: {
+    BASE_PATH: env.BASE_URL ?? '/pitanga-tcc',
+    CALLBACK_ENDPOINT: '/login/valid',
+    DOMAIN() { return new URL(this.BASE_PATH, env.CLIENT_HOST ?? 'http://localhost:3000'); },
+    get CALLBACK_URL() {
+      const url = this.DOMAIN();
+      url.pathname += this.CALLBACK_ENDPOINT;
+      return url.toString();
+    }
+  }
 };
