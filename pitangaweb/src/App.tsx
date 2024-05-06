@@ -7,7 +7,7 @@ import { getChallengeSolution, listChallenges } from './infra/data/pitanga.rest'
 import { ErrorPage } from './app/pages/ErrorPage';
 import { CreateChallenge } from './app/pages/CreateChallenge';
 import { Auth } from './app/config/auth.config';
-import { loginAction, requestAuthToken } from './app/actions/login-action';
+import { requestAuthToken } from './app/actions/login-action';
 
 const basename = import.meta.env.BASE_URL ?? '/pitanga-tcc';
 
@@ -36,10 +36,6 @@ export class App extends Component {
       loader: requestAuthToken
     }
   ], { basename });
-
-  componentDidMount(): void {
-    loginAction();
-  }
 
   render() {
     return (
