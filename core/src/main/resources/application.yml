@@ -4,10 +4,15 @@ server:
     certificate: classpath:certs/certificate.pem
     certificate-private-key: classpath:certs/key.pem
 spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    password: ${DB_PASSWORD:mysecretpassword}
+    username: ${DB_USERNAME:postgres}
+    driver-class-name: org.postgresql.Driver
   main:
     allow-bean-definition-overriding: true
   jpa:
-    show-sql: true
+    show-sql: ${SHOW_SQL:true}
   sql:
     init:
       mode: always
@@ -16,5 +21,5 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://localhost:8444/realms/master
-          jwk-set-uri: https://localhost:8444/realms/master/protocol/openid-connect/certs
+          issuer-uri: ${ISSUER_URI:https://localhost:8444/realms/master}
+          jwk-set-uri: ${JWK_SET_URI:https://localhost:8444/realms/master/protocol/openid-connect/certs}

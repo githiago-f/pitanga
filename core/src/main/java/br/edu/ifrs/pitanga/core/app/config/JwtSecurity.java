@@ -20,6 +20,7 @@ public class JwtSecurity {
             .authorizeExchange(ex -> ex.anyExchange().authenticated())
             .oauth2ResourceServer((rs) -> rs.jwt(Customizer.withDefaults()))
             .cors(cors -> cors.configurationSource(configurationSource()))
+            .csrf(csrf -> csrf.disable())
             .build();
     }
 
