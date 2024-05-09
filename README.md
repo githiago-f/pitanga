@@ -22,23 +22,3 @@ Pitanga é uma ferramenta online destinada a auxiliar o aprendizado de programa�
 ```bash
 ngrok http --domain=distinct-serval-known.ngrok-free.app https://localhost:8443
 ```
-
-### 💡: Isolate java processes
-
-```bash
-java -Djava.security.manager -Djava.security.policy=/path/to/java.policy <java.class>
-```
-#### 💡: Java policy template:
-
-```java.policy
-grant {
-    // Allow necessary permissions for basic Java operations
-    permission java.security.AllPermission;
-
-    // Deny network access
-    permission java.net.SocketPermission "*", "connect,listen,accept";
-
-    // Deny file system access
-    permission java.io.FilePermission "<<ALL FILES>>", "read";
-};
-```

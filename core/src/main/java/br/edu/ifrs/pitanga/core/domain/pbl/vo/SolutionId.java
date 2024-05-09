@@ -22,6 +22,6 @@ public class SolutionId {
     private String submitterId;
 
     public String toString() {
-        return challengeId.toString() + "/" + submitterId + "/" + version;
+        return submitterId + "/" + challengeId.toString() + "/" + version;
     }
 }

@@ -45,7 +45,7 @@ public class SubmittedSolutionsHandler {
 
         for (Validation validation : solution.getChallenge().getValidations()) {
             log.info("Executing for validation {}", validation.getId());
-            String output = runner.execute(solution, validation.getTestInput());
+            String output = runner.execute(solution, validation);
             log.info("Solution result: {}", output);
             response.addValidationResult(validation, output);
         }
