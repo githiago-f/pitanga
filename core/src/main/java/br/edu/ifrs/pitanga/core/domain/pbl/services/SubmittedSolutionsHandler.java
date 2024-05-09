@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifrs.pitanga.core.app.http.dto.SolutionResponse;
+import br.edu.ifrs.pitanga.core.app.http.errors.ChallengeDoesNotExist;
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
 import br.edu.ifrs.pitanga.core.domain.pbl.Solution;
 import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
@@ -41,13 +42,16 @@ public class SubmittedSolutionsHandler {
             .solutionId(solution.getId())
             .code(solution.getCode())
             .build();
-        
+
         for (Validation validation : solution.getChallenge().getValidations()) {
             log.info("Executing for validation {}", validation.getId());
             String output = runner.execute(solution, validation.getTestInput());
             log.info("Solution result: {}", output);
             response.addValidationResult(validation, output);
         }
+
+        solution.setPassAllValidations(response.getPassValidations());
+        solutionsRepository.save(solution);
 
         return Mono.just(response);
     }
@@ -65,9 +69,10 @@ public class SubmittedSolutionsHandler {
         entity.setVersion(solution);
 
         Challenge challenge = challengesRepository.findById(challengeId)
-            .orElseThrow();
+            .orElseThrow(() -> new ChallengeDoesNotExist());
+
         entity.setChallenge(challenge);
-        
+
         if(!entity.compareHash(solution)) {
             solution = solutionsRepository.save(entity);
         }

@@ -16,9 +16,13 @@ public class Solution {
     private String code;
     private String language;
     private String hash;
+
+    @Builder.Default
+    private Boolean passAllValidations = false;
+
     @Column(insertable = false, updatable = false)
     private Date createdAt;
-    
+
     @JoinColumn(insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Challenge challenge;

@@ -28,7 +28,8 @@ public class SolutionsController {
     private final SubmittedSolutionsHandler solutionsService;
 
     @GetMapping()
-    public Mono<ResponseEntity<SolutionResponse>> viewSolution(Authentication user, @PathVariable UUID challengeId) {
+    public Mono<ResponseEntity<SolutionResponse>> viewSolution(Authentication user,
+        @PathVariable UUID challengeId) {
         SearchSolutionCommand command = new SearchSolutionCommand(user.getName(), challengeId);
         return solutionsService.viewByVersion(command)
             .map(ResponseEntity.ok()::body)
@@ -36,11 +37,8 @@ public class SolutionsController {
     }
 
     @PutMapping
-    public SolutionResponse trySolution(
-        Authentication user,
-        @PathVariable UUID challengeId,
-        @RequestBody SolutionRequest solution
-    ) {
+    public SolutionResponse trySolution(Authentication user,
+        @PathVariable UUID challengeId, @RequestBody SolutionRequest solution) {
         SaveSolutionCommand command = new SaveSolutionCommand(
             solution.code(),
             solution.language(),

@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS solutions (
     "code" TEXT NOT NULL,
     "hash" TEXT NOT NULL,
     "language" VARCHAR(20) NOT NULL,
+    pass_all_validations BOOLEAN DEFAULT false,
     challenge_id UUID NOT NULL,
     submitter_id VARCHAR(64) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),

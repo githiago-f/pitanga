@@ -21,18 +21,18 @@ public class SolutionResponse {
 
     public void addValidationResult(Validation validation, String output) {
         ValidationResult result = new ValidationResult(
-            validation.getId(), 
-            validation.getTestInput(), 
+            validation.getId(),
+            validation.getTestInput(),
             output,
             validation.getExpectedOutput(),
-            validation.getExpectedOutput().equals(output) ? 
+            validation.getExpectedOutput().equals(output) ?
                 ValidationResultStatus.PASS : ValidationResultStatus.FAIL
         );
         validationResults.add(result);
     }
 
     public Boolean getPassValidations() {
-        boolean pass = true;
+        Boolean pass = validationResults.size() != 0;
         for (ValidationResult validationResult : validationResults) {
             if(validationResult.status() == ValidationResultStatus.FAIL) {
                 pass = false;

@@ -3,8 +3,9 @@ package br.edu.ifrs.pitanga.core.app.http;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.ifrs.pitanga.core.app.http.dto.ChallengePageable;
+import br.edu.ifrs.pitanga.core.app.http.dto.ChallengePageableFilter;
 import br.edu.ifrs.pitanga.core.app.http.dto.ChallengeRequest;
+import br.edu.ifrs.pitanga.core.app.http.dto.ChallengeResponse;
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.ChallengesService;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveChallengeCommand;
@@ -29,8 +30,8 @@ public class ChallengesController {
     private final ChallengesService challengesService;
 
     @GetMapping()
-    public Page<Challenge> list(ChallengePageable pageable) {
-        return challengesService.handle(pageable);
+    public Page<ChallengeResponse> list(Authentication user, ChallengePageableFilter pageable) {
+        return challengesService.findAndFilter(user.getName(), pageable);
     }
 
     @GetMapping("/{challengeId}")
@@ -41,8 +42,8 @@ public class ChallengesController {
     }
 
     @PatchMapping("/{challengeId}")
-    public ResponseEntity<Challenge> updateById(
-        @PathVariable UUID challengeId, @RequestBody ChallengeRequest request) {
+    public ResponseEntity<Challenge> updateById(@PathVariable UUID challengeId,
+        @RequestBody ChallengeRequest request) {
         return ResponseEntity.accepted().build();
     }
 
