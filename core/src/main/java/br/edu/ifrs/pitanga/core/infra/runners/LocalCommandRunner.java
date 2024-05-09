@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import br.edu.ifrs.pitanga.core.app.http.errors.SolutionProcessingException;
 import br.edu.ifrs.pitanga.core.domain.pbl.Solution;
 import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
 import br.edu.ifrs.pitanga.core.infra.TempFileCreator;
@@ -63,7 +64,7 @@ public class LocalCommandRunner implements CommandRunner {
             return runProgram(files);
         } catch(IOException e) {
             e.printStackTrace();
+            throw new SolutionProcessingException();
         }
-        return null;
     }
 }
