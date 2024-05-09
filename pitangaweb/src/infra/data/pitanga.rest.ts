@@ -4,13 +4,16 @@ import { apiBase } from './base';
 import { Params, redirect } from 'react-router-dom';
 import { Solution } from '../../domain/problem/solution';
 import { Page } from './page.dto';
+import { ChallengeListItem } from '../../domain/problem/challenge';
 
 export async function listChallenges() {
-  const challengesRaw = await apiBase.get<Page<Challenge[]>>('/challenges');
+  type Short = Page<ChallengeListItem[]>;
+  const challengesRaw = await apiBase.get<Short>('/challenges');
   if(!challengesRaw.data?.content) {
     throw new Error('Could not load page');
   }
-  return challengesRaw.data?.content.map(c => plainToInstance(Challenge, c));
+  return challengesRaw.data?.content
+    .map(c => plainToInstance(ChallengeListItem, c));
 }
 
 export async function getChallengeSolution({ params }: {params: Params}) {

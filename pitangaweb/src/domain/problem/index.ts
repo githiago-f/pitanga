@@ -1,2 +1,2 @@
-export { Challenge } from './challenge';
+export { Challenge, ChallengeListItem } from './challenge';
 export { Solution } from './solution';

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Challenge } from '../../../domain/problem';
+import { ChallengeListItem } from '../../../domain/problem';
 
-type Props = {challenge: Challenge}
+type Props = {challenge: ChallengeListItem}
 
 export const ChallengeItem = ({ challenge }: Props) => (
   <div className="border border-rose-300 shadow rounded-md p-4 max-w-2xl w-full mx-auto my-2">
@@ -16,7 +16,7 @@ export const ChallengeItem = ({ challenge }: Props) => (
         <Link
           aria-label={'Iniciar desafio ' + challenge.title}
           className="rounded bg-rose-500 text-white p-1 text-center col-span-1"
-          to={challenge.link}>Iniciar</Link>
+          to={challenge.link}>{challenge.status}</Link>
       </div>
     </div>
   </div>
