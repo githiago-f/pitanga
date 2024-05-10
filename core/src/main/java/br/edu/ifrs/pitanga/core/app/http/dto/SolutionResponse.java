@@ -1,11 +1,9 @@
 package br.edu.ifrs.pitanga.core.app.http.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import br.edu.ifrs.pitanga.core.app.http.dto.vo.ValidationResult;
 import br.edu.ifrs.pitanga.core.app.http.dto.vo.ValidationResultStatus;
-import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
 import br.edu.ifrs.pitanga.core.domain.pbl.vo.SolutionId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
