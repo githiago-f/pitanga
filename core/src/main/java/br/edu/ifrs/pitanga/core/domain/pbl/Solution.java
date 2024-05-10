@@ -1,6 +1,7 @@
 package br.edu.ifrs.pitanga.core.domain.pbl;
 
 import java.util.Date;
+import java.util.stream.Stream;
 
 import br.edu.ifrs.pitanga.core.domain.pbl.vo.SolutionId;
 import jakarta.persistence.*;
@@ -42,5 +43,9 @@ public class Solution {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public Stream<Validation> validations() {
+        return getChallenge().getValidations().stream();
     }
 }

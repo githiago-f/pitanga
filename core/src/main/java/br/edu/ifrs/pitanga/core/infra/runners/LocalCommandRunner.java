@@ -2,12 +2,15 @@ package br.edu.ifrs.pitanga.core.infra.runners;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import static java.lang.ProcessBuilder.Redirect.PIPE;
 
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 import br.edu.ifrs.pitanga.core.app.http.errors.SolutionProcessingException;
 import br.edu.ifrs.pitanga.core.domain.pbl.Solution;
 import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
@@ -24,26 +27,23 @@ public class LocalCommandRunner implements CommandRunner {
     }
 
     @SuppressWarnings("static-access")
-    private String runProgram(SolutionFiles files) throws IOException {
+    private Mono<String> runProgram(SolutionFiles files) throws IOException {
         log.info("Executing solution on dir {}", files.directory.getPath());
         Process process = new ProcessBuilder()
             .command("bash", "-c", "javac Solution.java && java Solution")
             .directory(files.directory)
             .redirectInput(PIPE.from(files.input))
             .start();
-        StringBuffer buffer = new StringBuffer();
-        try(var reader = process.inputReader(); var error = process.errorReader()) {
-            String line;
-            while((line = error.readLine()) != null) {
-                buffer.append(line);
-                Thread.yield();
-            }
-            while((line = reader.readLine()) != null) {
-                buffer.append(line);
-                Thread.yield();
-            }
-        }
-        return buffer.toString();
+
+        var future = process.onExit()
+            .orTimeout(30, TimeUnit.SECONDS);
+
+        return Mono.fromFuture(future).map(p -> {
+            StringBuffer stringBuffer = new StringBuffer();
+            p.inputReader().lines().forEachOrdered(i -> stringBuffer.append(i));
+            p.errorReader().lines().forEachOrdered(i -> stringBuffer.append(i));
+            return stringBuffer.toString();
+        });
     }
 
     private SolutionFiles createFiles(Solution solution, Validation validation) throws IOException {
@@ -56,7 +56,7 @@ public class LocalCommandRunner implements CommandRunner {
     }
 
     @Override
-    public String execute(Solution solution, Validation input) {
+    public Mono<String> execute(Solution solution, Validation input) {
         try {
             String challengeId = solution.getId().getChallengeId().toString();
             log.info("Running the solution for challenge {}", challengeId);

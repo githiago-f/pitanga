@@ -5,22 +5,19 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifrs.pitanga.core.app.http.dto.SolutionResponse;
-import br.edu.ifrs.pitanga.core.app.http.errors.ChallengeDoesNotExist;
+import br.edu.ifrs.pitanga.core.app.http.dto.vo.ValidationResult;
+import br.edu.ifrs.pitanga.core.app.http.errors.ChallengeNotFoundException;
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
 import br.edu.ifrs.pitanga.core.domain.pbl.Solution;
-import br.edu.ifrs.pitanga.core.domain.pbl.Validation;
 import br.edu.ifrs.pitanga.core.infra.MD5HashCalculator;
 import br.edu.ifrs.pitanga.core.infra.runners.CommandRunner;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import br.edu.ifrs.pitanga.core.domain.repositories.ChallengesRepository;
 import br.edu.ifrs.pitanga.core.domain.repositories.SolutionsRepository;
-import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SearchSolutionCommand;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveSolutionCommand;
 
-@Slf4j
 @Service
 @AllArgsConstructor
 public class SubmittedSolutionsHandler {
@@ -29,35 +26,36 @@ public class SubmittedSolutionsHandler {
     private final ChallengesRepository challengesRepository;
     private final MD5HashCalculator hashCalculator;
 
-    public Mono<SolutionResponse> viewByVersion(SearchSolutionCommand search) {
-        Solution solution = solutionsRepository.findByLastVersion(
-            search.submitterId(),
-            search.challengeId()
-        );
+    public Mono<SolutionResponse> viewLast(String userId, UUID challengeId) {
+        Solution solution = solutionsRepository.findByLastVersion(userId, challengeId);
         if(solution == null) {
             return Mono.empty();
         }
 
-        SolutionResponse response = SolutionResponse.builder()
+        SolutionResponse.SolutionResponseBuilder builder = SolutionResponse.builder()
             .solutionId(solution.getId())
-            .code(solution.getCode())
-            .build();
+            .code(solution.getCode());
 
-        for (Validation validation : solution.getChallenge().getValidations()) {
-            log.info("Executing for validation {}", validation.getId());
-            String output = runner.execute(solution, validation);
-            log.info("Solution result: {}", output);
-            response.addValidationResult(validation, output);
-        }
-
-        solution.setPassAllValidations(response.getPassValidations());
-        solutionsRepository.save(solution);
-
-        return Mono.just(response);
+        return getResults(solution, builder);
     }
 
-    @Transactional
-    public SolutionResponse handle(SaveSolutionCommand submission) {
+    private Mono<SolutionResponse> getResults(Solution solution, SolutionResponse.SolutionResponseBuilder builder) {
+        Flux<ValidationResult> results = Flux.concat(
+            solution.validations().map(input -> runner.execute(solution, input)
+                    .map(out -> ValidationResult.fromString(input, out))
+            ).toList()
+        );
+
+        return results.collectList().map(validations -> {
+            SolutionResponse response = builder.validationResults(validations)
+                .build();
+            solution.setPassAllValidations(response.getPassValidations());
+            solutionsRepository.save(solution);
+            return response;
+        });
+    }
+
+    public Mono<SolutionResponse> handle(SaveSolutionCommand submission) {
         UUID challengeId = submission.challengeId();
         Solution solution = solutionsRepository.findByLastVersion(
             submission.submitterId(),
@@ -69,7 +67,7 @@ public class SubmittedSolutionsHandler {
         entity.setVersion(solution);
 
         Challenge challenge = challengesRepository.findById(challengeId)
-            .orElseThrow(() -> new ChallengeDoesNotExist());
+            .orElseThrow(() -> new ChallengeNotFoundException());
 
         entity.setChallenge(challenge);
 
@@ -77,11 +75,10 @@ public class SubmittedSolutionsHandler {
             solution = solutionsRepository.save(entity);
         }
 
-        SolutionResponse response = SolutionResponse.builder()
-            .solutionId(solution.getId())
-            .code(solution.getCode())
-            .build();
+        SolutionResponse.SolutionResponseBuilder builder = SolutionResponse.builder()
+            .solutionId(entity.getId())
+            .code(entity.getCode());
 
-        return response;
+        return getResults(entity, builder);
     }
 }

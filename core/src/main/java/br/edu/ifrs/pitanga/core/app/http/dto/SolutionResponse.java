@@ -16,20 +16,7 @@ import lombok.Data;
 public class SolutionResponse {
     private SolutionId solutionId;
     private String code;
-    @Builder.Default
-    private List<ValidationResult> validationResults = new ArrayList<>();
-
-    public void addValidationResult(Validation validation, String output) {
-        ValidationResult result = new ValidationResult(
-            validation.getId(),
-            validation.getTestInput(),
-            output,
-            validation.getExpectedOutput(),
-            validation.getExpectedOutput().equals(output) ?
-                ValidationResultStatus.PASS : ValidationResultStatus.FAIL
-        );
-        validationResults.add(result);
-    }
+    private List<ValidationResult> validationResults;
 
     public Boolean getPassValidations() {
         Boolean pass = validationResults.size() != 0;
