@@ -2,7 +2,7 @@ package br.edu.ifrs.pitanga.core.infra.runners;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static java.lang.ProcessBuilder.Redirect.PIPE;
 
@@ -21,6 +21,7 @@ import br.edu.ifrs.pitanga.core.infra.TempFileCreator;
 @AllArgsConstructor
 public class LocalCommandRunner implements CommandRunner {
     private TempFileCreator fileCreator;
+    private final Long TIMEOUT = 5l;
 
     private static class SolutionFiles {
         File input, directory;
@@ -35,15 +36,15 @@ public class LocalCommandRunner implements CommandRunner {
             .redirectInput(PIPE.from(files.input))
             .start();
 
-        var future = process.onExit()
-            .orTimeout(30, TimeUnit.SECONDS);
-
-        return Mono.fromFuture(future).map(p -> {
-            StringBuffer stringBuffer = new StringBuffer();
-            p.inputReader().lines().forEachOrdered(i -> stringBuffer.append(i));
-            p.errorReader().lines().forEachOrdered(i -> stringBuffer.append(i));
-            return stringBuffer.toString();
-        });
+        return Mono.fromFuture(process.onExit().orTimeout(TIMEOUT, SECONDS))
+            .onErrorComplete()
+            .map(p -> {
+                StringBuffer stringBuffer = new StringBuffer();
+                p.inputReader().lines().forEachOrdered(i -> stringBuffer.append(i));
+                p.errorReader().lines().forEachOrdered(i -> stringBuffer.append(i));
+                return stringBuffer.toString();
+            })
+            .doFinally((signal) -> process.destroyForcibly());
     }
 
     private SolutionFiles createFiles(Solution solution, Validation validation) throws IOException {
