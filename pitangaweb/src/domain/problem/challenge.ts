@@ -1,3 +1,4 @@
+import { Labels } from '../../app/assets/i18n';
 import { ValidationResult } from './solution';
 
 export class ValidationId {
@@ -12,7 +13,10 @@ export class Validation {
 }
 
 export enum ChallengeLevel {
-
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
+  PRO = 'PRO'
 }
 
 export class Challenge {
@@ -29,13 +33,21 @@ export class Challenge {
   }
 }
 
-export enum SolutionStatus { SOLVED, NOT_STARTED, STARTED }
+export enum SolutionStatus {
+  SOLVED = 'SOLVED',
+  NOT_STARTED = 'NOT_STARTED',
+  STARTED = 'STARTED'
+}
 
 export class ChallengeListItem {
   public readonly id!: string;
   public readonly title!: string;
   public readonly level!: ChallengeLevel;
   public readonly status!: SolutionStatus;
+
+  get statusLabel(): string {
+    return Labels.challenge.list.item.status[this.status];
+  }
 
   get link() {
     return `/challenge/${this.id}`;

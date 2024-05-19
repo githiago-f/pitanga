@@ -14,9 +14,9 @@ export const ChallengeItem = ({ challenge }: Props) => (
           {challenge.title}
         </h4>
         <Link
-          aria-label={'Iniciar desafio ' + challenge.title}
+          aria-label={challenge.statusLabel + ' ' + challenge.title}
           className="rounded bg-rose-500 text-white p-1 text-center col-span-1"
-          to={challenge.link}>{challenge.status}</Link>
+          to={challenge.link}>{challenge.statusLabel}</Link>
       </div>
     </div>
   </div>

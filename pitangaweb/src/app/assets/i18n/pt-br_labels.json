@@ -1,0 +1,14 @@
+{
+    "challenge": {
+        "list": {
+            "item": {
+                "status": {
+                    "SOLVED": "Resolvido",
+                    "STARTED": "Continuar",
+                    "NOT_STARTED": "Iniciar"
+                }
+            },
+            "fallback": "Ainda nenhum desafio para você."
+        }
+    }
+}
