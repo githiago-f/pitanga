@@ -34,6 +34,9 @@ jobs:
           npm run build
         env:
           API_BASE_URL: ${{ vars.API_BASE_URL }}
+          AUTHORIZE_URL: ${{ vars.AUTHORIZE_URL }}
+          TOKEN_URL: ${{ vars.TOKEN_URL }}
+          CLIENT_HOST: ${{ vars.CLIENT_HOST }}
       - name: Deploy to gh pages
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
