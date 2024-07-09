@@ -15,7 +15,6 @@ services:
       dockerfile: ./docker/keycloak.Dockerfile
       context: .
       args:
-        HOSTNAME_URL: https://localhost:8444
         PG_URL: jdbc:postgres://postgres:5432/postgres
     environment:
       KEYCLOAK_ADMIN: admin

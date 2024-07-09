@@ -23,7 +23,12 @@ jobs:
       - name: Build
         run: |
           echo "API Base: $API_BASE_URL"
+          echo "KC URL: $AUTHORIZE_URL"
+          echo "TOKEN URL: $TOKEN_URL"
           export PITANGA_API_BASE_URL=$API_BASE_URL
+          export PITANGA_AUTHORIZE_URL=$AUTHORIZE_URL
+          export PITANGA_TOKEN_URL=$TOKEN_URL
+          export PITANGA_CLIENT_HOST=$CLIENT_HOST
           cd pitangaweb
           npm install
           npm run build
