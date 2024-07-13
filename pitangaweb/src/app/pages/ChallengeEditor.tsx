@@ -3,39 +3,49 @@ import { useLoaderData } from 'react-router-dom';
 import { Solution } from '../../domain/problem/solution';
 import { ValidationContainer } from '../components/validation';
 import { ToolTray } from '../components/tool-tray';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { saveSolution } from '../../infra/data/pitanga.rest';
 import { DescriptionModal } from '../components/description-modal';
 import { EditorConfigContext, defaultEditorConfig } from '../components/editor/editor-config.context';
 import { Editor } from '../components/editor/editor';
+import { debounce } from '../../infra/utils/throttle';
 
 export const ChallengeEditor = () => {
   const {challenge, solution: currentSolution} = useLoaderData() as {
     challenge: Challenge,
     solution?: Solution
   };
+  const [isSaving, setIsSaving] = useState(false);
   const [solution, setSolution] = useState(currentSolution);
   const [code, setCode] = useState(solution?.code ?? challenge.baseCode);
   const [viewDescription, setViewDescription] = useState(false);
+
+  const executeCodeListener = useRef(debounce((code: string) => {
+    const request = {
+      language: 'java',
+      code,
+      challengeId: challenge.id
+    };
+    saveSolution(request).then(sol => {
+      setSolution(sol);
+      setIsSaving(false);
+    });
+  }));
 
   useEffect(() => {
     document.title = 'Pitanga | ' + challenge.title;
   }, [challenge]);
 
-  const executeCode = useCallback(async () => {
-    const sol = await saveSolution({
-      language: 'java',
-      code: code,
-      challengeId: challenge.id
-    });
-    setSolution(sol);
-  }, [code, challenge]);
+  const persistCode = async (code: string) => {
+    setCode(code);
+    setIsSaving(true);
+    executeCodeListener.current(code);
+  };
 
   return (
     <>
       <ToolTray
         title={challenge.title}
-        onSave={executeCode}
         onClickViewDoc={() => setViewDescription(!viewDescription)}
         solutionCodeChanged={code !== solution?.code}
       />
@@ -46,7 +56,7 @@ export const ChallengeEditor = () => {
         description={challenge.description}
       />
       <EditorConfigContext.Provider value={defaultEditorConfig}>
-        <Editor customContent={code} onChangeCode={setCode}/>
+        <Editor customContent={code} onChangeCode={persistCode}/>
       </EditorConfigContext.Provider>
       <ValidationContainer
         validations={challenge.validationResults}

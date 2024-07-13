@@ -9,7 +9,7 @@ type Props = {
 };
 
 export const ValidationContainer = (props: Props) => {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   return (
     <div className={'validation-container ' + (show ? 'bottom-0' : '-bottom-80') }>
       <button

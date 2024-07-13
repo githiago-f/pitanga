@@ -19,7 +19,8 @@ const config = {
     ],
     semi: ['error', 'always'],
     quotes: ['error', 'single'],
-    indent: ['error', 2]
+    indent: ['error', 2],
+    "@typescript-eslint/ban-types": "off"
   },
 }
 
