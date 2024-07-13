@@ -25,8 +25,6 @@ RUN /opt/keycloak/bin/kc.sh build
 FROM quay.io/keycloak/keycloak:24.0.3-0
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
-ARG HOSTNAME_URL="https://localhost:8444"
-
 ENV KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/certs/certificate.pem
 ENV KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/certs/key.pem
 ENV KC_HOSTNAME_STRICT_HTTPS=true
