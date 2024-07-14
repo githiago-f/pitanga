@@ -23,11 +23,11 @@ export const ValidationItem = (props: ValidationResult) => {
     >
       <div className="grid grid-cols-6 pb-1">
         <div className="col-span-5">
-          <p>Input: {props.input}</p>
-          <p>Output esperado: {props.expectedOutput}</p>
+          <p>Input: {props.input?.trim()?.length > 0 ? props.input : 'Sem input'}</p>
+          <p className='font-black'>Output esperado: {props.expectedOutput}</p>
         </div>
       </div>
-      <p hidden={!isOpen} className="border border-gray-700 bg-gray-700 rounded-sm p-2">
+      <p hidden={isOpen} className="border border-gray-700 bg-gray-700 rounded-sm p-2">
         {props.output}
       </p>
     </li>

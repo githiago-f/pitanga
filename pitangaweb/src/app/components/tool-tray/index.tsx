@@ -17,7 +17,7 @@ export const ToolTray = (props: Props) => (
         <img className='h-5 w-full' src='/pitanga-tcc/back.svg' alt='voltar'/>
       </Link>
       <div className="col-span-3 p-1 flex items-center">
-        <Title title={props.title} />
+        <Title onClick={props.onClickViewDoc} title={props.title} />
       </div>
       <div className="col-span-2">
         <ViewDoc onClick={props.onClickViewDoc} />

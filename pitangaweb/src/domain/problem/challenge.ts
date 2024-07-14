@@ -52,4 +52,8 @@ export class ChallengeListItem {
   get link() {
     return `/challenge/${this.id}`;
   }
+
+  get levelLabel(): string {
+    return Labels.challenge.list.item.level[this.level];
+  }
 }

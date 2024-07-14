@@ -21,7 +21,9 @@ const Editor = ({ baseCode, setBaseCode }: Props) => (
     defaultValue={baseCode}
     editorProps={{ $blockScrolling: true }}
     height="calc(100vh - 5rem)"
+    scrollMargin={[0, screen.height > 672 ? 672 : screen.height, 0, 50]}
     width={`calc(${screen.width > 672 ? 672 : screen.width}px - 1.5rem)`}
+    enableBasicAutocompletion={true}
     onChange={(value) => setBaseCode(value)}
   />
 );

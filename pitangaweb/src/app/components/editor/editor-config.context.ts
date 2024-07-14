@@ -7,8 +7,13 @@ export const defaultEditorConfig = {
   width: '100vw',
   heigth: () => {
     const tray = document.getElementById('tooltray');
-    const height = (tray?.style.height ?? '52px');
+    const height = (tray?.style.height ?? '76px');
     return `calc(100vh - ${height})`;
+  },
+  scrollMargin: () => {
+    const tray = document.getElementById('tooltray');
+    const height = tray?.style.height ? parseInt(tray.style.height.replace('px', '')) : 76;
+    return window.outerHeight - height;
   }
 };
 export const EditorConfigContext = createContext(defaultEditorConfig);

@@ -24,6 +24,8 @@ export const Editor = ({ customContent, onChangeCode }: Props) => {
       editorProps={{ $blockScrolling: true }}
       height={context.heigth()}
       width={context.width}
+      enableBasicAutocompletion={true}
+      scrollMargin={[0, context.scrollMargin(), 0, 50]}
       onChange={(value) => onChangeCode(value)}
     />
   );
