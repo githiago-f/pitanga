@@ -1,4 +1,56 @@
 services:
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    ports:
+      - 8005:8080
+    volumes:
+      - devtools:/tmp/jetty
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512mb
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - pitangaweb
+    volumes:
+      - kafka:/var/lib/zookeeper/data
+      - kafka:/var/lib/zookeeper/log
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512mb
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - pitangaweb
+    volumes:
+      - kafka:/var/lib/kafka/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
   postgres:
     image: postgres
     container_name: postgres-container
@@ -11,31 +63,38 @@ services:
       - pitangaweb
     ports:
       - "5432:5432"
-  keycloak:
-    build:
-      dockerfile: ./docker/keycloak.Dockerfile
-      context: .
-      args:
-        PG_URL: jdbc:postgres://postgres:5432/kc_pitanga
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: changeme
-    ports:
-      - "8444:8443"
-    networks:
-      - pitangaweb
-    depends_on:
-      - postgres
     deploy:
-      replicas: 1
       resources:
         limits:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 2G
+
+  # keycloak:
+  #   build:
+  #     dockerfile: ./docker/keycloak.Dockerfile
+  #     context: .
+  #     args:
+  #       PG_URL: jdbc:postgres://postgres:5432/kc_pitanga
+  #   environment:
+  #     KEYCLOAK_ADMIN: admin
+  #     KEYCLOAK_ADMIN_PASSWORD: changeme
+  #   ports:
+  #     - "8444:8443"
+  #   networks:
+  #     - pitangaweb
+  #   depends_on:
+  #     - postgres
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.25'
+  #         memory: 1G
 
 networks:
   pitangaweb:
     driver: bridge
 
 volumes:
+  kafka:
+  devtools:
   postgres-data:

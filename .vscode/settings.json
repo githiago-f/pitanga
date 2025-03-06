@@ -1,6 +1,5 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "automatic",
+    "plantuml.server": "http://localhost:8005",
     "editor.codeActionsOnSave": {
         "source.fixAll": "always"
     }

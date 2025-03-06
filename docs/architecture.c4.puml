@@ -1,0 +1,37 @@
+@startuml architecture
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!define DEVICON https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define DEVICON2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/refs/heads/main/icons/devicons2
+
+!include <C4/C4_Container>
+!include DEVICON/java.puml
+!include DEVICON/react.puml
+!include DEVICON2/apachekafka_original.puml
+!include DEVICON2/docker.puml
+!include FONTAWESOME/users.puml
+
+
+' Ator utilizando o serviço
+Person(aluno, "Alunos", $descr="Aluno resolvendo problemas", $sprite="users")
+
+System_Boundary(pitanga, "Pitanga Server") {
+    Container(web_app, "Web Application", "typescript", $descr="Possibilita os usuários criarem novos desafios, ...", $sprite="react")
+    Container(core, "Pitanga Core", "java", $descr="API RESTful...", $sprite="java")
+    Rel(web_app, core, "Acessa", "https")
+
+    System(kafka, "Kafka Broker", "Kafka broker para distribuição de eventos (execução de um desafio)", $sprite="apachekafka_original")
+    Rel_D(core, kafka, "Escreve/Lê", "stream")
+
+
+    System(kc, "Keycloak", "java", $descr="Servidor de autenticação de acesso OAuth2")
+    Rel_U(core, kc, "Autentica", "https")
+
+    Container(javaServer, "Java Executor\nFollower", $descr="Java service follower", $sprite="docker")
+    Container(sql, "SQL Service\nFollower", $descr="SQL service follower that handles sql queries", $sprite="docker")
+    Rel_D(kafka, javaServer, "1")
+    Rel_D(kafka, sql, "n")
+}
+
+Rel(aluno, web_app, "request", "https")
+
+@enduml
