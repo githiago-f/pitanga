@@ -5,7 +5,7 @@ server:
     certificate-private-key: classpath:certs/key.pem
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    url: ${CHALLENGES_DB_URL:jdbc:postgresql://localhost:5432/postgres}
     password: ${DB_PASSWORD:mysecretpassword}
     username: ${DB_USERNAME:postgres}
     driver-class-name: org.postgresql.Driver
@@ -21,5 +21,5 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${ISSUER_URI:https://pitanga.ngrok.io/realms/master}
-          jwk-set-uri: ${JWK_SET_URI:https://pitanga.ngrok.io/realms/master/protocol/openid-connect/certs}
+          issuer-uri: ${ISSUER_URI}
+          jwk-set-uri: ${JWK_SET_URI}

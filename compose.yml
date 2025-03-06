@@ -12,53 +12,34 @@ services:
           cpus: '0.25'
           memory: 512mb
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+  nginx:
+    image: nginx
     networks:
       - pitangaweb
     volumes:
-      - kafka:/var/lib/zookeeper/data
-      - kafka:/var/lib/zookeeper/log
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512mb
-
-  kafka:
-    image: confluentinc/cp-kafka:7.3.0
+      - $resource_cert_path:/root
+      - ./.docker/nginx/templates:/etc/nginx/templates
+    environment:
+      API_SERVICE: https://localhost:8443
+      KC_URL: https://keycloak:8443
+    ports:
+      - 443:443
     depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    ports:
-      - "9092:9092"
-    networks:
-      - pitangaweb
-    volumes:
-      - kafka:/var/lib/kafka/data
+      - keycloak
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 1G
+          cpus: '0.50'
+          memory: 512mb
 
   postgres:
     image: postgres
     container_name: postgres-container
     environment:
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_PASSWORD: $DB_PASSWORD
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./.docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pitangaweb
     ports:
@@ -67,28 +48,28 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 2G
+          memory: 1G
 
-  # keycloak:
-  #   build:
-  #     dockerfile: ./docker/keycloak.Dockerfile
-  #     context: .
-  #     args:
-  #       PG_URL: jdbc:postgres://postgres:5432/kc_pitanga
-  #   environment:
-  #     KEYCLOAK_ADMIN: admin
-  #     KEYCLOAK_ADMIN_PASSWORD: changeme
-  #   ports:
-  #     - "8444:8443"
-  #   networks:
-  #     - pitangaweb
-  #   depends_on:
-  #     - postgres
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '0.25'
-  #         memory: 1G
+  keycloak:
+    build:
+      dockerfile: ./.docker/keycloak.Dockerfile
+      context: .
+      args:
+        PG_URL: $KC_DB_URL
+        PG_PASS: $DB_PASSWORD
+        PG_NAME: $DB_USERNAME
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: changeme
+    networks:
+      - pitangaweb
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 800mb
 
 networks:
   pitangaweb:

@@ -12,8 +12,6 @@ Pitanga √© uma ferramenta online destinada a auxiliar o aprendizado de programa√
 ```bash
 # it may be necessary to set execute permission
 ./install.sh
-
-./start.sh
 ```
 
 
