@@ -6,7 +6,6 @@ services:
     volumes:
       - devtools:/tmp/jetty
     deploy:
-      replicas: 1
       resources:
         limits:
           cpus: '0.25'
@@ -17,11 +16,13 @@ services:
     networks:
       - pitangaweb
     volumes:
-      - $resource_cert_path:/root
-      - ./.docker/nginx/templates:/etc/nginx/templates
+      - $CERT_BASE_PATH:/root
+      - ./.docker/nginx:/etc/nginx/templates
     environment:
       API_SERVICE: https://localhost:8443
       KC_URL: https://keycloak:8443
+      PORT: $PORT
+      SERVER_NAME: $COMMON_NAME
     ports:
       - 443:443
     depends_on:

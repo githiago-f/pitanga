@@ -1,21 +1,26 @@
-CommonName="localhost"
+source .env
 
-export SHOW_SQL=false
-export CHALLENGES_DB_URL="jdbc:postgresql://localhost:5432/challenges_pitanga"
-export KC_DB_URL="jdbc:postgresql://postgres:5432/kc_pitanga"
-export DB_PASSWORD="mysecretpassword"
-export DB_USERNAME="postgres"
-export ISSUER_URI="https://localhost/auth/realms/master"
-export JWK_SET_URI="https://localhost/auth/realms/master/protocol/openid-connect/certs"
+CommonName=$COMMON_NAME
 
-KEY_PATH=./core/src/main/resources/certs/key.pem
-CERT_PATH=./core/src/main/resources/certs/certificate.pem
+read_dom () {
+    local IFS=\>
+    read -d \< ENTITY CONTENT
+}
 
-export resource_cert_path=${CERT_PATH%/*}
+projects=()
 
-if (!(test -e $resource_cert_path)); then
-    echo "Creating resources cert path $resource_cert_path"
-    mkdir $resource_cert_path
+while read_dom; do
+    if [[ $ENTITY = "module" ]]; then
+        projects=("${projects[@]}" "$CONTENT")
+    fi
+done < pom.xml
+
+KEY_PATH=$CERT_BASE_PATH/key.pem
+CERT_PATH=$CERT_BASE_PATH/certificate.pem
+
+if (!(test -e $CERT_BASE_PATH)); then
+    echo "Creating resources cert path $CERT_BASE_PATH"
+    mkdir $CERT_BASE_PATH
 fi
 
 if (!(test -e $CERT_PATH)); then
@@ -25,6 +30,12 @@ if (!(test -e $CERT_PATH)); then
 
     keytool -delete -cacerts -alias pitanga -storepass $STORE_PASS
     keytool -importcert -cacerts -file $CERT_PATH -alias pitanga -storepass $STORE_PASS
+
+    for project in "${projects[@]}"; do
+        mkdir ./$project/src/main/resources/certs
+        cp $CERT_PATH ./$project/src/main/resources/certs/certificate.pem
+        cp $KEY_PATH  ./$project/src/main/resources/certs/key.pem
+    done
 
     sudo chmod og+r $KEY_PATH
     docker compose up -d --build keycloak

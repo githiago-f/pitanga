@@ -18,5 +18,5 @@ Pitanga é uma ferramenta online destinada a auxiliar o aprendizado de programa�
 ### 💡: Run ngrok
 
 ```bash
-ngrok http --domain=distinct-serval-known.ngrok-free.app https://localhost:8443
+ngrok http --domain=distinct-serval-known.ngrok-free.app https://localhost
 ```
