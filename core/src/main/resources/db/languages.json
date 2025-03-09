@@ -1,0 +1,50 @@
+[
+    {
+      "name": "ASM",
+      "source_file": "program.asm",
+      "compile_cmd": "/usr/local/nasm -f elf64 program.asm -o program.o && ld -o program program.o",
+      "run_command": "./program"
+    },
+    {
+      "name": "Bash",
+      "source_file": "script.sh",
+      "compile_cmd": "",
+      "run_command": "/usr/local/bash script.sh"
+    },
+    {
+      "name": "C",
+      "source_file": "program.c",
+      "compile_cmd": "/usr/local/clang -o program program.c",
+      "run_command": "./program"
+    },
+    {
+      "name": "Go",
+      "source_file": "program.go",
+      "compile_cmd": "/usr/local/go build program.go",
+      "run_command": "./program"
+    },
+    {
+      "name": "Java",
+      "source_file": "Program.java",
+      "compile_cmd": "/usr/local/jdk21/bin/javac Program.java",
+      "run_command": "/usr/local/jdk21/bin/java Program"
+    },
+    {
+      "name": "JavaScript (Node.js)",
+      "source_file": "program.js",
+      "compile_cmd": "",
+      "run_command": "/usr/local/node program.js"
+    },
+    {
+      "name": "Lua",
+      "source_file": "program.lua",
+      "compile_cmd": "",
+      "run_command": "/usr/local/lua program.lua"
+    },
+    {
+      "name": "SQLite",
+      "source_file": "program.sql",
+      "compile_cmd": "",
+      "run_command": "/usr/local/sqlite < program.sql"
+    }
+  ]
