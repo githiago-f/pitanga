@@ -1,7 +1,7 @@
 FROM quay.io/keycloak/keycloak:24.0.3-0 AS builder
 
-ARG CERT_PATH="./core/src/main/resources/certs/certificate.pem"
-ARG KEY_PATH="./core/src/main/resources/certs/key.pem"
+ARG CERT_PATH="./.docker/certs/certificate.pem"
+ARG KEY_PATH="./.docker/certs/key.pem"
 
 COPY $CERT_PATH /opt/keycloak/certs/certificate.pem
 COPY $KEY_PATH /opt/keycloak/certs/key.pem

@@ -1,3 +1,10 @@
+#!/bin/bash
+
+if (!(test -e .env)); then
+    echo "ERROR: Invalid .env file, create it with the .env.example file";
+    exit 1;
+fi
+
 source .env
 
 CommonName=$COMMON_NAME
@@ -31,14 +38,17 @@ if (!(test -e $CERT_PATH)); then
     keytool -delete -cacerts -alias pitanga -storepass $STORE_PASS
     keytool -importcert -cacerts -file $CERT_PATH -alias pitanga -storepass $STORE_PASS
 
-    for project in "${projects[@]}"; do
-        mkdir ./$project/src/main/resources/certs
-        cp $CERT_PATH ./$project/src/main/resources/certs/certificate.pem
-        cp $KEY_PATH  ./$project/src/main/resources/certs/key.pem
-    done
-
     sudo chmod og+r $KEY_PATH
-    docker compose up -d --build keycloak
+    docker compose build keycloak
 fi
+
+for project in "${projects[@]}"; do
+    mkdir ./$project/src/main/resources/certs
+    cp $CERT_PATH ./$project/src/main/resources/certs/certificate.pem
+    cp $KEY_PATH  ./$project/src/main/resources/certs/key.pem
+done
+
+docker build ./.docker -t pitanga/compilers:1.0.0 --file ./.docker/compilers.Dockerfile
+docker build ./.docker -t pitanga/code:1.0.0 --file ./.docker/pitanga-code.Dockerfile
 
 docker compose up -d nginx
