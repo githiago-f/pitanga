@@ -6,6 +6,7 @@
 !include <C4/C4_Container>
 !include DEVICON/java.puml
 !include DEVICON/react.puml
+!include DEVICON/nginx.puml
 !include DEVICON2/docker.puml
 !include FONTAWESOME/users.puml
 
@@ -13,9 +14,15 @@
 ' Ator utilizando o serviço
 Person(aluno, "Alunos", $descr="Aluno resolvendo problemas", $sprite="users")
 
-System_Boundary(pitanga, "Pitanga Server") {
+Container(web_app, "Pitanga Web", "typescript, reactjs", "Static Web Application served through github or localhost:3000", $sprite="react")
 
+System_Boundary(pitanga, "Pitanga Server") {
+    System(nginx, "API Gateway", "API Gateway that serves KeyCloak and all subservices of Pitanga", $sprite="nginx")
+    Rel(web_app, nginx, "", "https")
+    Container(core, "Challenge API", "spring", "Challenges api service", $sprite="java")
+    Rel_R(nginx, core, "", "http2")
 }
+
 
 Rel(aluno, web_app, "request", "https")
 
