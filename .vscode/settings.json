@@ -2,5 +2,7 @@
     "plantuml.server": "http://localhost:8005",
     "editor.codeActionsOnSave": {
         "source.fixAll": "always"
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "postman.settings.dotenv-detection-notification-visibility": false
 }

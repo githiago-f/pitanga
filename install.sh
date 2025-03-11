@@ -24,21 +24,33 @@ done < pom.xml
 
 KEY_PATH=$CERT_BASE_PATH/key.pem
 CERT_PATH=$CERT_BASE_PATH/certificate.pem
+KC_KEY_PATH=$CERT_BASE_PATH/kc/key.pem
+KC_CERT_PATH=$CERT_BASE_PATH/kc/certificate.pem
 
 if (!(test -e $CERT_BASE_PATH)); then
     echo "Creating resources cert path $CERT_BASE_PATH"
     mkdir $CERT_BASE_PATH
+    mkdir $CERT_BASE_PATH/kc
 fi
 
 if (!(test -e $CERT_PATH)); then
+    # define the common name cert for ngix or spring applications ($COMMON_NAME)
     openssl req -x509 -newkey rsa:4096 -nodes -keyout $KEY_PATH -out $CERT_PATH \
         -sha256 -days 3650 -nodes \
         -subj "/C=BR/ST=RioGrandeDoSul/L=PortoAlegre/O=IFRSPitanga/OU=TI/CN=$CommonName"
 
-    keytool -delete -cacerts -alias pitanga -storepass $STORE_PASS
-    keytool -importcert -cacerts -file $CERT_PATH -alias pitanga -storepass $STORE_PASS
+    # define the docker cert for keycloak
+    openssl req -x509 -newkey rsa:4096 -nodes -keyout $KC_KEY_PATH -out $KC_CERT_PATH \
+        -sha256 -days 3650 -nodes \
+        -subj "/C=BR/ST=RioGrandeDoSul/L=PortoAlegre/O=IFRSPitanga/OU=TI/CN=keycloak"
+
+    keytool -delete -cacerts -alias pitanga -storepass changeit
+    keytool -delete -cacerts -alias keycloak -storepass changeit
+    keytool -importcert -trustcacerts -noprompt -cacerts -file $CERT_PATH -alias pitanga -storepass changeit
+    keytool -importcert -trustcacerts -noprompt -cacerts -file $KC_CERT_PATH -alias keycloak -storepass changeit
 
     sudo chmod og+r $KEY_PATH
+    sudo chmod og+r $KC_KEY_PATH
     docker compose build keycloak
 fi
 
@@ -49,6 +61,6 @@ for project in "${projects[@]}"; do
 done
 
 docker build ./.docker -t pitanga/compilers:1.0.0 --file ./.docker/compilers.Dockerfile
-docker build ./.docker -t pitanga/code:1.0.0 --file ./.docker/pitanga-code.Dockerfile
 
+docker compose build pitanga-code
 docker compose up -d nginx

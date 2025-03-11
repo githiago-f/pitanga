@@ -1,0 +1,72 @@
+{"properties": [
+  {
+    "name": "pitanga.sandbox.limits.cpu-time",
+    "type": "java.lang.Double",
+    "description": "Default runtime limit for every program (in seconds). Decimal numbers are allowed."
+  },
+  {
+    "name": "pitanga.sandbox.limits.extra-cpu-time",
+    "type": "java.lang.Double",
+    "description": "When a time limit is exceeded, wait for extra time (in seconds), before killing the program."
+  },
+  {
+    "name": "pitanga.sandbox.limits.wall-time",
+    "type": "java.lang.Double",
+    "description": "This clock measures the time from the start of the program to its exit, so it does not stop when the program has lost the CPU or when it is waiting for an external event."
+  },
+  {
+    "name": "pitanga.sandbox.limits.memory",
+    "type": "java.lang.Integer",
+    "description": "Limit address space of the program in kilobytes."
+  },
+  {
+    "name": "pitanga.sandbox.limits.stack",
+    "type": "java.lang.Integer",
+    "description": "Limit process stack in kilobytes."
+  },
+  {
+    "name": "pitanga.sandbox.limits.max-wall-time",
+    "type": "java.lang.Double",
+    "description": "Maximum custom WALL_TIME_LIMIT."
+  },
+  {
+    "name": "pitanga.sandbox.limits.max-cpu-time",
+    "type": "java.lang.Double",
+    "description": "Maximum custom CPU_TIME_LIMIT."
+  },
+  {
+    "name": "pitanga.sandbox.limits.max-extra-cpu-time",
+    "type": "java.lang.String",
+    "description": "A description for 'pitanga.sandbox.limits.max-extra-cpu-time'"
+  },
+  {
+    "name": "pitanga.sandbox.limits.max-memory",
+    "type": "java.lang.String",
+    "description": "A description for 'pitanga.sandbox.limits.max-memory'"
+  },
+  {
+    "name": "pitanga.sandbox.limits.max-stack",
+    "type": "java.lang.String",
+    "description": "A description for 'pitanga.sandbox.limits.max-stack'"
+  },
+  {
+    "name": "pitanga.sandbox.files.stdin",
+    "type": "java.lang.String",
+    "description": "A description for 'pitanga.sandbox.files.stdin'"
+  },
+  {
+    "name": "pitanga.sandbox.files.stdout",
+    "type": "java.lang.String",
+    "description": "A description for 'pitanga.sandbox.files.stdout'"
+  },
+  {
+    "name": "pitanga.sandbox.files.stderr",
+    "type": "java.lang.String",
+    "description": "A description for 'pitanga.sandbox.files.stderr'"
+  },
+  {
+    "name": "pitanga.sandbox.files.meta",
+    "type": "java.lang.String",
+    "description": "A description for 'pitanga.sandbox.files.meta'"
+  }
+]}
