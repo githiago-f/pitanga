@@ -1,16 +1,45 @@
+###############################
+# Stage 1: Build the Artifact #
+###############################
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+ARG PITANGA_CODE_PATH="core"
+
+WORKDIR /build
+
+COPY ${PITANGA_CODE_PATH}/pom.xml .
+RUN mvn dependency:go-offline -B
+
+COPY $PITANGA_CODE_PATH/src ./src
+COPY $PITANGA_CODE_PATH/pom.xml .
+COPY ./.docker/certs/kc/certificate.pem ./kc/certificate.pem
+
+RUN mvn clean package -DskipTests
+
+#####################################
+# Stage 2: Create the Runtime Image #
+#####################################
 FROM pitanga/compilers:1.0.0 AS compilers
-
-EXPOSE 8443
-
-WORKDIR /api
 
 RUN mkdir -p /run/isolate && echo "/sys/fs/cgroup" > /run/isolate/cgroup
 
-RUN useradd -u 1000 -m -r pitanga && \
-    echo "pitanga ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers
+WORKDIR /opt/app
 
-USER pitanga
+COPY --from=build /build/target/core-1.0.0.jar .
+RUN mkdir -p ./kc
+COPY --from=build /build/kc/certificate.pem ./kc/certificate.pem
 
+ENV JAVA_HOME="/usr/local/jdk21"
+
+RUN keytool -importcert \
+    -trustcacerts \
+    -noprompt \
+    -cacerts \
+    -file ./kc/certificate.pem \
+    -alias keycloak \
+    -storepass changeit
+
+EXPOSE 8443
 LABEL version=0.0.2
 
-CMD ["sleep", "infinity"]
+CMD ["java", "-jar", "core-1.0.0.jar"]

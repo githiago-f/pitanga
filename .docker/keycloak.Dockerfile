@@ -1,7 +1,7 @@
 FROM quay.io/keycloak/keycloak:24.0.3-0 AS builder
 
-ARG CERT_PATH="./.docker/certs/certificate.pem"
-ARG KEY_PATH="./.docker/certs/key.pem"
+ARG CERT_PATH="./.docker/certs/kc/certificate.pem"
+ARG KEY_PATH="./.docker/certs/kc/key.pem"
 
 COPY $CERT_PATH /opt/keycloak/certs/certificate.pem
 COPY $KEY_PATH /opt/keycloak/certs/key.pem
@@ -16,13 +16,6 @@ ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_FEATURES=token-exchange
 
-ARG PG_URL="jdbc:postgresql://postgres:5432/kc_pitanga"
-ARG PG_NAME="postgres"
-ARG PG_PASS="mysecretpassword"
-
-ENV KC_DB_URL=$PG_URL
-ENV KC_DB_USERNAME=$PG_NAME
-ENV KC_DB_PASSWORD=$PG_PASS
 ENV KC_PROXY_HEADERS=xforwarded
 ENV KC_HTTP_RELATIVE_PATH=auth
 
