@@ -1,3 +1,3 @@
 package br.edu.ifrs.pitanga.core.app.http.dto;
 
-public record SolutionRequest(String code, String language) {}
+public record SolutionRequest(String code, Long languageId) {}

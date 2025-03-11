@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import br.edu.ifrs.pitanga.core.app.http.dto.SolutionResponse;
 import br.edu.ifrs.pitanga.core.app.http.dto.vo.ValidationResult;
 import br.edu.ifrs.pitanga.core.app.http.errors.ChallengeNotFoundException;
+import br.edu.ifrs.pitanga.core.app.http.errors.LanguageNotFoundException;
 import br.edu.ifrs.pitanga.core.domain.pbl.Challenge;
+import br.edu.ifrs.pitanga.core.domain.pbl.Language;
 import br.edu.ifrs.pitanga.core.domain.pbl.Solution;
 import br.edu.ifrs.pitanga.core.infra.MD5HashCalculator;
 import br.edu.ifrs.pitanga.core.infra.runners.CommandRunner;
@@ -15,6 +17,7 @@ import lombok.AllArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import br.edu.ifrs.pitanga.core.domain.repositories.ChallengesRepository;
+import br.edu.ifrs.pitanga.core.domain.repositories.LanguagesRepository;
 import br.edu.ifrs.pitanga.core.domain.repositories.SolutionsRepository;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveSolutionCommand;
 
@@ -24,6 +27,7 @@ public class SubmittedSolutionsHandler {
     private final CommandRunner runner;
     private final SolutionsRepository solutionsRepository;
     private final ChallengesRepository challengesRepository;
+    private final LanguagesRepository languagesRepository;
     private final MD5HashCalculator hashCalculator;
 
     public Mono<SolutionResponse> viewLast(String userId, UUID challengeId) {
@@ -62,7 +66,10 @@ public class SubmittedSolutionsHandler {
             challengeId
         );
 
-        Solution entity = submission.toEntity();
+        Language lang = languagesRepository.findById(submission.languageId())
+            .orElseThrow(() -> new LanguageNotFoundException());
+
+        Solution entity = submission.toEntity(lang);
         entity.setHash(hashCalculator.calculate(entity.getCode()));
         entity.setVersion(solution);
 

@@ -36,7 +36,7 @@ public class SolutionsController {
         @PathVariable UUID challengeId, @RequestBody SolutionRequest solution) {
         SaveSolutionCommand command = new SaveSolutionCommand(
             solution.code(),
-            solution.language(),
+            solution.languageId(),
             challengeId,
             user.getName()
         );
