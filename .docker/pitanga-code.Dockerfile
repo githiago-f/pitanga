@@ -27,6 +27,7 @@ WORKDIR /opt/app
 
 COPY --from=build /build/target/core-1.0.0.jar .
 RUN mkdir -p ./kc
+RUN mkdir -p ./tmp
 COPY --from=build /build/kc/certificate.pem ./kc/certificate.pem
 
 ENV JAVA_HOME="/usr/local/jdk21"
@@ -38,6 +39,14 @@ RUN keytool -importcert \
     -file ./kc/certificate.pem \
     -alias keycloak \
     -storepass changeit
+
+RUN apt-get update && apt-get install -y sudo
+
+RUN useradd -u 1000 -m -r pitanga && \
+    echo "pitanga ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
+    chown pitanga: /opt/app/tmp
+
+USER pitanga
 
 EXPOSE 8443
 LABEL version=0.0.2

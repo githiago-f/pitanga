@@ -3,11 +3,13 @@ package br.edu.ifrs.pitanga.core.infra;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 
 import static br.edu.ifrs.pitanga.core.infra.runners.vo.Config.CHARSET;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class CommandBuilder {
     private final List<String> args;
 
@@ -26,11 +28,15 @@ public class CommandBuilder {
         return this;
     }
 
-    public Mono<Stream<String>> build() {
+    public Mono<List<String>> build() {
         try {
             var process = new ProcessBuilder().command(args).start().onExit();
             return Mono.fromFuture(process).flatMap(
-                p -> Mono.just(p.inputReader(CHARSET).lines())
+                p -> {
+                    List<String> result = p.inputReader(CHARSET).lines().toList();
+                    log.debug("Result for command {} is {}", args, result);
+                    return Mono.just(result);
+                }
             );
         } catch(IOException e) {
             return Mono.error(e);

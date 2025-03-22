@@ -15,7 +15,6 @@ public class Solution {
     @EmbeddedId
     private SolutionId id;
     private String code;
-
     private String hash;
 
     @Builder.Default
@@ -24,8 +23,8 @@ public class Solution {
     @Column(insertable = false, updatable = false)
     private Date createdAt;
 
+    @JoinColumn
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(insertable = false, updatable = false)
     private Language language;
 
     @JoinColumn(insertable = false, updatable = false)

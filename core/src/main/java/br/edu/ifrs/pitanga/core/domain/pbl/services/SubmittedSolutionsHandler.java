@@ -14,6 +14,7 @@ import br.edu.ifrs.pitanga.core.domain.pbl.Solution;
 import br.edu.ifrs.pitanga.core.infra.MD5HashCalculator;
 import br.edu.ifrs.pitanga.core.infra.runners.CommandRunner;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import br.edu.ifrs.pitanga.core.domain.repositories.ChallengesRepository;
@@ -21,6 +22,7 @@ import br.edu.ifrs.pitanga.core.domain.repositories.LanguagesRepository;
 import br.edu.ifrs.pitanga.core.domain.repositories.SolutionsRepository;
 import br.edu.ifrs.pitanga.core.domain.pbl.services.commands.SaveSolutionCommand;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class SubmittedSolutionsHandler {
@@ -45,8 +47,9 @@ public class SubmittedSolutionsHandler {
 
     private Mono<SolutionResponse> getResults(Solution solution, SolutionResponse.SolutionResponseBuilder builder) {
         Flux<ValidationResult> results = Flux.concat(
-            solution.validations().map(input -> runner.execute(solution, input)
-                    .map(out -> ValidationResult.fromString(input, out))
+            solution.validations()
+                .map(input -> runner.execute(solution, input)
+                .map(out -> ValidationResult.fromString(input, out))
             ).toList()
         );
 
@@ -66,10 +69,12 @@ public class SubmittedSolutionsHandler {
             challengeId
         );
 
-        Language lang = languagesRepository.findById(submission.languageId())
+        Language language = languagesRepository.findById(submission.languageId())
             .orElseThrow(() -> new LanguageNotFoundException());
 
-        Solution entity = submission.toEntity(lang);
+        log.debug("Executing submission :: {}", language);
+
+        Solution entity = submission.toEntity(language);
         entity.setHash(hashCalculator.calculate(entity.getCode()));
         entity.setVersion(solution);
 
@@ -77,7 +82,6 @@ public class SubmittedSolutionsHandler {
             .orElseThrow(() -> new ChallengeNotFoundException());
 
         entity.setChallenge(challenge);
-
         if(!entity.compareHash(solution)) {
             solution = solutionsRepository.save(entity);
         }

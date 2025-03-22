@@ -1,9 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- DROP TABLE solutions CASCADE;
--- DROP TABLE validations CASCADE;
--- DROP TABLE challenges CASCADE;
-
 CREATE TABLE IF NOT EXISTS challenges (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title TEXT NOT NULL,
@@ -33,7 +29,7 @@ CREATE TABLE IF NOT EXISTS solutions (
     "version" BIGINT NOT NULL DEFAULT nextval('solutions_version_seq'),
     "code" TEXT NOT NULL,
     "hash" TEXT NOT NULL,
-    "language" TEXT NOT NULL,
+    "language_id" BIGINT NOT NULL,
     pass_all_validations BOOLEAN DEFAULT false,
     challenge_id UUID NOT NULL,
     submitter_id TEXT NOT NULL,
@@ -42,10 +38,8 @@ CREATE TABLE IF NOT EXISTS solutions (
     FOREIGN KEY("challenge_id") REFERENCES challenges ON DELETE CASCADE
 );
 
-CREATE SEQUENCE IF NOT EXISTS langauges_id_seq;
-
 CREATE TABLE IF NOT EXISTS languages (
-    "id" BIGINT NOT NULL DEFAULT nextval('langauges_id_seq'),
+    "id" BIGINT NOT NULL,
     "name" TEXT NOT NULL,
     "source_file" TEXT NOT NULL,
     "compile_cmd" TEXT NOT NULL,

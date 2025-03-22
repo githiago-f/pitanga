@@ -4,14 +4,16 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
-import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 
 import static br.edu.ifrs.pitanga.core.infra.runners.vo.Config.CHARSET;
 
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class IsolateBuilder {
-    private List<String> args;
+    private final List<String> args;
 
     private IsolateBuilder(List<String> args) {
         this.args = args;
@@ -67,6 +69,18 @@ public class IsolateBuilder {
         return this;
     }
 
+    public IsolateBuilder xTime(Double time) {
+        args.add("-x");
+        args.add(String.valueOf(time));
+        return this;
+    }
+
+    public IsolateBuilder wall(Double time) {
+        args.add("-w");
+        args.add(String.valueOf(time));
+        return this;
+    }
+
     public IsolateBuilder out(String fileDir) {
         args.add("-o");
         args.add(fileDir);
@@ -85,6 +99,18 @@ public class IsolateBuilder {
         return this;
     }
 
+    public IsolateBuilder fileSize(Integer size) {
+        args.add("-f");
+        args.add(String.valueOf(size));
+        return this;
+    }
+
+    public IsolateBuilder dir(String dir) {
+        args.add("-d");
+        args.add(dir);
+        return this;
+    }
+
     public IsolateBuilder env(String... values) {
         for(String val : values) {
             args.add("-E");
@@ -100,14 +126,29 @@ public class IsolateBuilder {
         return this;
     }
 
-    public Mono<Stream<String>> build() {
+    public Mono<List<String>> build() {
         try {
-            var process = new ProcessBuilder().command(args).start().onExit();
-            return Mono.fromFuture(process).flatMap(
-                p -> Mono.just(p.inputReader(CHARSET).lines())
-            );
+            log.debug("Running command: {}", args);
+            var process = new ProcessBuilder().command(args).start();
+            return Mono.fromFuture(process.onExit())
+                .onErrorComplete()
+                .flatMap(
+                    p -> {
+                        List<String> result = new ArrayList<>();
+                        p.inputReader().lines().forEachOrdered(result::add);
+                        log.info("Result for command {} is {}", args, result);
+                        return Mono.just(result);
+                    }
+                );
         } catch(IOException e) {
             return Mono.error(e);
         }
+    }
+
+    public IsolateBuilder run(String command) {
+        args.add("--run");
+        args.add("--");
+        args.add(command);
+        return this;
     }
 }

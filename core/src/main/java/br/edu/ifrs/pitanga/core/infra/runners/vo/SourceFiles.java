@@ -12,8 +12,8 @@ public class SourceFiles{
         this.workdir = workdir;
         this.boxdir = workdir + "/box";
         this.sourceFile = boxdir + "/" + sourceFile;
-        this.stdinFile = workdir + "/" + files.getStdin();
-        this.stdoutFile = workdir + "/" + files.getStdout();
-        this.stderrFile = workdir + "/" + files.getStderr();
+        this.stdinFile = boxdir + "/" + files.getStdin();
+        this.stdoutFile = boxdir + "/" + files.getStdout();
+        this.stderrFile = boxdir + "/" + files.getStderr();
     }
 }
