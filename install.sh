@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Check for .env file
 if (!(test -e .env)); then
     echo "ERROR: Invalid .env file, create it with the .env.example file";
     exit 1;
@@ -7,8 +8,17 @@ fi
 
 source .env
 
-CommonName=$COMMON_NAME
+CGROUP=/mnt/pitanga_cgroup
+# Create own writable cgroup
+if (!(test -d "$CGROUP")); then
+    sudo mkdir $CGROUP
+    sudo mount -t tmpfs tmpfs $CGROUP
+    sudo mount -t cgroup2 none $CGROUP
 
+    echo "+cpu" | sudo tee $CGROUP/cgroup.subtree_control
+fi
+
+# Check for the projects on root pom.xml
 read_dom () {
     local IFS=\>
     read -d \< ENTITY CONTENT
@@ -22,10 +32,12 @@ while read_dom; do
     fi
 done < pom.xml
 
+# Create cert for each project and also for keyclock
 KEY_PATH=$CERT_BASE_PATH/key.pem
 CERT_PATH=$CERT_BASE_PATH/certificate.pem
 KC_KEY_PATH=$CERT_BASE_PATH/kc/key.pem
 KC_CERT_PATH=$CERT_BASE_PATH/kc/certificate.pem
+CommonName=$COMMON_NAME
 
 if (!(test -e $CERT_BASE_PATH)); then
     echo "Creating resources cert path $CERT_BASE_PATH"
@@ -60,6 +72,7 @@ for project in "${projects[@]}"; do
     cp $KEY_PATH  ./$project/src/main/resources/certs/key.pem
 done
 
+# Build compilers and start the docker container
 docker build ./.docker -t pitanga/compilers:1.0.0 --file ./.docker/compilers.Dockerfile
 
 docker compose build pitanga-code

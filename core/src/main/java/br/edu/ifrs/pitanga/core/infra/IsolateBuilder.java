@@ -1,4 +1,4 @@
-package br.edu.ifrs.pitanga.core.infra.runners;
+package br.edu.ifrs.pitanga.core.infra;
 
 import java.util.Map;
 import java.util.List;
@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
-
-import static br.edu.ifrs.pitanga.core.infra.runners.vo.Config.CHARSET;
 
 import reactor.core.publisher.Mono;
 
@@ -126,29 +124,44 @@ public class IsolateBuilder {
         return this;
     }
 
-    public Mono<List<String>> build() {
+    public IsolateBuilder run(String... command) {
+        args.add("--run");
+        args.add("--");
+        args.add(String.join(" ", command));
+        return this;
+    }
+
+    public record Output(List<String> error, List<String> out, int exitValue) {
+        public String errorAsString() {
+            StringBuilder sb = new StringBuilder();
+            error.forEach(st -> {
+                sb.append(st);
+                sb.append("\n");
+            });
+            return sb.toString();
+        }
+    }
+
+    public Mono<Output> build() {
         try {
-            log.debug("Running command: {}", args);
+            log.info("Command -> {}", args);
             var process = new ProcessBuilder().command(args).start();
             return Mono.fromFuture(process.onExit())
-                .onErrorComplete()
                 .flatMap(
                     p -> {
-                        List<String> result = new ArrayList<>();
-                        p.inputReader().lines().forEachOrdered(result::add);
-                        log.info("Result for command {} is {}", args, result);
-                        return Mono.just(result);
+                        Output out = new Output(
+                            p.errorReader().lines().toList(),
+                            p.inputReader().lines().toList(),
+                            p.exitValue()
+                        );
+
+                        log.info("Result for command {} is {}", args, out);
+
+                        return Mono.just(out);
                     }
                 );
         } catch(IOException e) {
             return Mono.error(e);
         }
-    }
-
-    public IsolateBuilder run(String command) {
-        args.add("--run");
-        args.add("--");
-        args.add(command);
-        return this;
     }
 }

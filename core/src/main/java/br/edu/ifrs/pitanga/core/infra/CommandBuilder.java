@@ -6,7 +6,6 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static br.edu.ifrs.pitanga.core.infra.runners.vo.Config.CHARSET;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -33,7 +32,9 @@ public class CommandBuilder {
             var process = new ProcessBuilder().command(args).start().onExit();
             return Mono.fromFuture(process).flatMap(
                 p -> {
-                    List<String> result = p.inputReader(CHARSET).lines().toList();
+                    List<String> result = new ArrayList<>();
+                    p.errorReader().lines().forEachOrdered(result::add);
+                    p.inputReader().lines().forEachOrdered(result::add);
                     log.debug("Result for command {} is {}", args, result);
                     return Mono.just(result);
                 }

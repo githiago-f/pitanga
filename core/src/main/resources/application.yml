@@ -40,6 +40,9 @@ pitanga:
       stdout: stdout.txt
       stderr: stderr.txt
     limits:
+      retry: ${MAX_EXECUTION_RETRY_ON_INTERNAL_ERROR:10}
+      retry-milis: ${EXECUTION_RETRY_DELAY:100}
+
       cpu-time: ${CPU_TIME_LIMIT:5}
       extra-cpu-time: ${CPU_EXTRA_TIME:1}
       wall-time: ${WALL_TIME_LIMIT:10}

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.core.io.Resource;
 
-import br.edu.ifrs.pitanga.core.domain.repositories.LanguagesRepository;
 import lombok.AllArgsConstructor;
 
 @Component
@@ -20,7 +19,6 @@ public class LanguagesDataInitializer implements CommandLineRunner {
     private final String LANGUAGES_FILE = "classpath:db/languages.json";
 
     private ResourceLoader resourceLoader;
-    private LanguagesRepository languagesRepository;
 
     private record Language(
         Long id,
@@ -28,17 +26,7 @@ public class LanguagesDataInitializer implements CommandLineRunner {
         String source_file,
         String compile_cmd,
         String run_command
-    ) {
-        br.edu.ifrs.pitanga.core.domain.pbl.Language toEntity() {
-            return br.edu.ifrs.pitanga.core.domain.pbl.Language.builder()
-                .id(id)
-                .name(name)
-                .compileCmd(compile_cmd)
-                .runCommand(run_command)
-                .sourceFile(source_file)
-                .build();
-        }
-    }
+    ) {}
 
     @Override
     public void run(String... args) throws Exception {
@@ -47,12 +35,12 @@ public class LanguagesDataInitializer implements CommandLineRunner {
         TypeReference<List<Language>> typeRef = new TypeReference<List<Language>>() {};
         try(var input = langsFile.getInputStream()) {
             List<Language> langs = mapper.readValue(input, typeRef);
-            Long persisted = languagesRepository.count();
+            // Long persisted = languagesRepository.count();
 
-            if(langs.size() == persisted) return;
+            // if(langs.size() == persisted) return;
 
             for (Language language : langs) {
-                languagesRepository.save(language.toEntity());
+                // languagesRepository.save(language.toEntity());
             }
         }
     }

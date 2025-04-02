@@ -82,6 +82,7 @@ services:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
+    cgroup_parent: docker.slice
     networks:
       - pitangaweb
     depends_on:
