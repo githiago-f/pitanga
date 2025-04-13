@@ -6,7 +6,9 @@ import lombok.Getter;
 @Getter
 public class SourceFiles {
     private String workdir, boxdir;
-    private String sourceFile, stdinFile, stdoutFile, stderrFile, compileOut;
+    private String sourceFile, stdinFile,
+                    stdoutFile, stderrFile,
+                    compileOut, compileScript;
 
     public SourceFiles(String workdir, String sourceFile, FilesConfiguration files) {
         this.workdir = workdir;
@@ -16,5 +18,6 @@ public class SourceFiles {
         this.stdoutFile = boxdir + "/" + files.getStdout();
         this.stderrFile = boxdir + "/" + files.getStderr();
         this.compileOut = boxdir + "/compile_out.txt";
+        this.compileScript = boxdir + "/compile.sh";
     }
 }

@@ -8,16 +8,6 @@ fi
 
 source .env
 
-CGROUP=/mnt/pitanga_cgroup
-# Create own writable cgroup
-if (!(test -d "$CGROUP")); then
-    sudo mkdir $CGROUP
-    sudo mount -t tmpfs tmpfs $CGROUP
-    sudo mount -t cgroup2 none $CGROUP
-
-    echo "+cpu" | sudo tee $CGROUP/cgroup.subtree_control
-fi
-
 # Check for the projects on root pom.xml
 read_dom () {
     local IFS=\>

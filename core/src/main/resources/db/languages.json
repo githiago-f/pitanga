@@ -1,58 +1,93 @@
 [
-    {
-      "id": 1,
-      "name": "ASM",
-      "source_file": "program.asm",
-      "compile_cmd": "/usr/local/nasm -f elf64 program.asm -o program.o && ld -o program program.o",
-      "run_command": "./program"
-    },
-    {
-      "id": 2,
-      "name": "Bash",
-      "source_file": "script.sh",
-      "compile_cmd": "",
-      "run_command": "/usr/local/bash script.sh"
-    },
-    {
-      "id": 3,
-      "name": "C",
-      "source_file": "program.c",
-      "compile_cmd": "/usr/local/clang -o program program.c",
-      "run_command": "./program"
-    },
-    {
-      "id": 4,
-      "name": "Go",
-      "source_file": "program.go",
-      "compile_cmd": "/usr/local/go build program.go",
-      "run_command": "./program"
-    },
-    {
-      "id": 5,
-      "name": "Java",
-      "source_file": "Program.java",
-      "compile_cmd": "/usr/local/jdk21/bin/javac Program.java",
-      "run_command": "/usr/local/jdk21/bin/java Program"
-    },
-    {
-      "id": 6,
-      "name": "JavaScript (Node.js)",
-      "source_file": "program.js",
-      "compile_cmd": "",
-      "run_command": "/usr/local/node program.js"
-    },
-    {
-      "id": 7,
-      "name": "Lua",
-      "source_file": "program.lua",
-      "compile_cmd": "",
-      "run_command": "/usr/local/lua program.lua"
-    },
-    {
-      "id": 8,
-      "name": "SQLite",
-      "source_file": "program.sql",
-      "compile_cmd": "",
-      "run_command": "/usr/local/sqlite < program.sql"
-    }
-  ]
+  {
+    "id": 1,
+    "name": "Assembly (NASM)",
+    "source_file": "main.asm",
+    "compile_cmd": "/usr/local/nasm-$VERSION/bin/nasmld -f elf64 $ARGS main.asm",
+    "run_command": "./$BINARY_FILE"
+  },
+  {
+    "id": 2,
+    "name": "Bash 5.0",
+    "source_file": "script.sh",
+    "compile_cmd": "",
+    "run_command": "/usr/local/bash-5.0/bin/bash script.sh"
+  },
+  {
+    "id": 3,
+    "name": "C (GCC 7.4.0)",
+    "source_file": "main.c",
+    "compile_cmd": "/usr/local/gcc-7.4.0/bin/gcc %s main.c",
+    "run_command": "./a.out"
+  },
+  {
+    "id": 4,
+    "name": "C (GCC 8.3.0)",
+    "source_file": "main.c",
+    "compile_cmd": "/usr/local/gcc-8.3.0/bin/gcc %s main.c",
+    "run_command": "./a.out"
+  },
+  {
+    "id": 5,
+    "name": "C (GCC 9.2.0)",
+    "source_file": "main.c",
+    "compile_cmd": "/usr/local/gcc-9.2.0/bin/gcc %s main.c",
+    "run_command": "./a.out"
+  },
+  {
+    "id": 6,
+    "name": "Go",
+    "source_file": "main.go",
+    "compile_cmd": "GOCACHE=/tmp/.cache/go-build /usr/local/go-1.24.2/bin/go build %s main.go",
+    "run_command": "./main"
+  },
+  {
+    "id": 7,
+    "name": "Java",
+    "source_file": "Main.java",
+    "compile_cmd": "/usr/local/jdk21/bin/javac %s Main.java",
+    "run_command": "/usr/local/jdk21/bin/java Main"
+  },
+  {
+    "id": 8,
+    "name": "JavaScript (Node.js)",
+    "source_file": "script.js",
+    "compile_cmd": "",
+    "run_command": "/usr/local/node-12.14.0/bin/node script.js"
+  },
+  {
+    "id": 9,
+    "name": "Lua",
+    "source_file": "script.lua",
+    "compile_cmd": "/usr/local/lua-5.3.5/luac53 %s script.lua",
+    "run_command": "/usr/local/lua-5.3.5/lua53 ./luac.out"
+  },
+  {
+    "id": 10,
+    "name": "SQLite",
+    "source_file": "program.sql",
+    "compile_cmd": "",
+    "run_command": "/bin/cat script.sql | /usr/bin/sqlite3 db.sqlite"
+  },
+  {
+    "id": 11,
+    "name": "Python 2",
+    "source_file": "script.py",
+    "compile_cmd": "",
+    "run_command": "/usr/local/python-2.7.17/bin/python2 script.py"
+  },
+  {
+    "id": 12,
+    "name": "Python 3",
+    "source_file": "script.py",
+    "compile_cmd": "",
+    "run_command": "/usr/local/python-3.8.1/bin/python3 script.py"
+  },
+  {
+    "id": 13,
+    "name": "TypeScript 5.8",
+    "source_file": "script.ts",
+    "compile_cmd": "/usr/bin/tsc %s script.ts",
+    "run_command": "/usr/local/node-12.14.0/bin/node script.js"
+  }
+]

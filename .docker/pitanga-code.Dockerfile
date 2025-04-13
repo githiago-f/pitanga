@@ -31,6 +31,7 @@ RUN mkdir -p ./tmp
 COPY --from=build /build/kc/certificate.pem ./kc/certificate.pem
 
 ENV JAVA_HOME="/usr/local/jdk21"
+ENV PATH="/usr/local/jdk21/bin:$PATH"
 
 RUN keytool -importcert \
     -trustcacerts \
@@ -40,7 +41,11 @@ RUN keytool -importcert \
     -alias keycloak \
     -storepass changeit
 
-RUN apt-get update && apt-get install -y sudo
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -u 1000 -m -r pitanga && \
     echo "pitanga ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \

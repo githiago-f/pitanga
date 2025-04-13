@@ -22,11 +22,11 @@ final class LanguageDTO extends SubmissionLanguage {}
 public class IsolateChecker implements CommandLineRunner {
     private CommandRunner runner;
 
-    private final LanguageDTO javaLang = LanguageDTO.builder()
+    private final LanguageDTO goLang = LanguageDTO.builder()
         .name("go")
-        .sourceFile("program.go")
-        .compileCmd("/usr/local/go build program.go")
-        .runCommand("./program")
+        .sourceFile("main.go")
+        .compileCmd("GOCACHE=/tmp/.cache/go-build /usr/local/go-1.24.2/bin/go build %s main.go")
+        .runCommand("./main")
         .build();
 
     @Override
@@ -34,7 +34,7 @@ public class IsolateChecker implements CommandLineRunner {
         SubmissionDTO submissionDTO = SubmissionDTO.builder()
             .id(5l)
             .code("package main\n\nimport \"fmt\"\n\nfunc main() {\n\s\sfmt.Println(\"Hello, World!\")\n}")
-            .language(javaLang)
+            .language(goLang)
             .build();
 
         runner.execute(submissionDTO)
