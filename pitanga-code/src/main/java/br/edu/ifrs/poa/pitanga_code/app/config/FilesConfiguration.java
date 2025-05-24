@@ -1,4 +1,4 @@
-package br.edu.ifrs.pitanga.core.infra.runners.config;
+package br.edu.ifrs.poa.pitanga_code.app.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

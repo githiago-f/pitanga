@@ -1,7 +1,9 @@
 package br.edu.ifrs.pitanga.core.infra.runners;
 
-import br.edu.ifrs.pitanga.core.infra.runners.config.LimitsConfiguration;
 import br.edu.ifrs.pitanga.core.infra.runners.vo.*;
+import br.edu.ifrs.poa.pitanga_code.app.config.FilesConfiguration;
+import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
-import br.edu.ifrs.pitanga.core.infra.runners.config.FilesConfiguration;
 import br.edu.ifrs.pitanga.core.infra.IsolateBuilder;
 import br.edu.ifrs.pitanga.core.infra.CommandBuilder;
 

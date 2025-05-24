@@ -1,6 +1,6 @@
 package br.edu.ifrs.pitanga.core.infra.runners.vo;
 
-import br.edu.ifrs.pitanga.core.infra.runners.config.FilesConfiguration;
+import br.edu.ifrs.poa.pitanga_code.app.config.FilesConfiguration;
 import lombok.Getter;
 
 @Getter

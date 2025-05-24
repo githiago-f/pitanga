@@ -11,7 +11,6 @@ logging:
         # web: DEBUG
         security: DEBUG
 
-
 spring:
   datasource:
     url: ${CHALLENGES_DB_URL:jdbc:postgresql://localhost:5432/postgres}
@@ -22,10 +21,8 @@ spring:
     allow-bean-definition-overriding: true
   jpa:
     show-sql: ${SHOW_SQL:true}
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:db/schema.sql
+    hibernate:
+      ddl-auto: update
   security:
     oauth2:
       resourceserver:

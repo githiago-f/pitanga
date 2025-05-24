@@ -3,7 +3,7 @@
 ###############################
 FROM maven:3.9-eclipse-temurin-21 AS build
 
-ARG PITANGA_CODE_PATH="core"
+ARG PITANGA_CODE_PATH="pitanga-code"
 
 WORKDIR /build
 
@@ -25,9 +25,8 @@ RUN mkdir -p /run/isolate && echo "/sys/fs/cgroup" > /run/isolate/cgroup
 
 WORKDIR /opt/app
 
-COPY --from=build /build/target/core-1.0.0.jar .
-RUN mkdir -p ./kc
-RUN mkdir -p ./tmp
+COPY --from=build /build/target/pitanga-code-0.0.1-SNAPSHOT.jar ./pitanga-code.jar
+RUN mkdir -p ./kc && mkdir -p ./tmp
 COPY --from=build /build/kc/certificate.pem ./kc/certificate.pem
 
 ENV JAVA_HOME="/usr/local/jdk21"
@@ -56,4 +55,4 @@ USER pitanga
 EXPOSE 8443
 LABEL version=0.0.2
 
-CMD ["java", "-jar", "core-1.0.0.jar"]
+CMD ["java", "-jar", "pitanga-code.jar"]
