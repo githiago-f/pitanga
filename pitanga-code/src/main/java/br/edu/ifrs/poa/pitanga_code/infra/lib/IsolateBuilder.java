@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +18,7 @@ public class IsolateBuilder {
 
     public static IsolateBuilder builder() {
         List<String> isolateCommand = new ArrayList<>();
+        isolateCommand.add("sudo");
         isolateCommand.add("isolate");
         return new IsolateBuilder(isolateCommand);
     }
@@ -122,10 +124,19 @@ public class IsolateBuilder {
         return this;
     }
 
+    public IsolateBuilder processesOrThreads(int maxProcessesOrThreads) {
+        args.add("-p");
+        args.add(String.valueOf(maxProcessesOrThreads));
+
+        return this;
+    }
+
     public IsolateBuilder run(String... command) {
         args.add("--run");
         args.add("--");
-        args.add(String.join(" ", command));
+        for (String cmd : command) {
+            args.add(cmd);
+        }
         return this;
     }
 
@@ -141,7 +152,8 @@ public class IsolateBuilder {
     }
 
     public Output build() throws IOException, InterruptedException {
-        log.info("Command -> {}", args);
+        log.info("Command -> {}", String.join(" ", args));
+
         var process = new ProcessBuilder().command(args).start();
         int exitValue = process.waitFor();
 

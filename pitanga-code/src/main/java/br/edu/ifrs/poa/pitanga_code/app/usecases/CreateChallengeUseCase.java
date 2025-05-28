@@ -36,13 +36,13 @@ public class CreateChallengeUseCase {
             languages.add(lang);
         });
 
-        Challenge challenge = Challenge.builder()
-                .allowedLanguages(languages)
-                .title(command.title())
-                .description(command.description())
-                .customBaseCode(command.baseCode().orElse(null))
-                .creator(user.getName())
-                .build();
+        Challenge challenge = new Challenge(
+                command.title(),
+                command.description(),
+                user.getName(),
+                command.baseCode().get(),
+                command.initialDifficultyLevel(),
+                languages);
 
         return challengesRepository.save(challenge);
     }

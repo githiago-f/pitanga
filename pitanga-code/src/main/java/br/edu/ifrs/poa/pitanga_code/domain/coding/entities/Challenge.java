@@ -1,22 +1,17 @@
 package br.edu.ifrs.poa.pitanga_code.domain.coding.entities;
 
-import java.util.Optional;
 import java.util.Set;
 
 import br.edu.ifrs.poa.pitanga_code.domain.coding.vo.Difficulty;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "challenges")
+@Table(name = "challenges", indexes = {
+        @Index(unique = true, columnList = "slug")
+})
 public class Challenge {
     @Id
     @Column(name = "challenge_id")
@@ -30,6 +25,9 @@ public class Challenge {
     @Column(columnDefinition = "TEXT")
     private String creator;
 
+    @Column(length = 100, name = "slug")
+    private String slug;
+
     @Nullable
     @Column(nullable = true, columnDefinition = "TEXT")
     private String customBaseCode;
@@ -39,6 +37,17 @@ public class Challenge {
 
     @ManyToMany(targetEntity = Language.class, fetch = FetchType.EAGER)
     private Set<Language> allowedLanguages;
+
+    public Challenge(String title, String description, String creator, String customBaseCode,
+            Difficulty difficultyLevel, Set<Language> allowedLanguages) {
+        this.title = title;
+        this.description = description;
+        this.creator = creator;
+        this.customBaseCode = customBaseCode;
+        this.difficultyLevel = difficultyLevel;
+        this.allowedLanguages = allowedLanguages;
+        this.slug = title.toLowerCase().trim().substring(0, 100).replace(" ", "-");
+    }
 
     public boolean checkAllow(Language language) {
         return allowedLanguages == null ||

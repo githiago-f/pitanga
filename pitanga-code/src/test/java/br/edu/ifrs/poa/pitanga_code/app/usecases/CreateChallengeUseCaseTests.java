@@ -84,4 +84,8 @@ public class CreateChallengeUseCaseTests {
         assertThat("Challenge allow golang", challenge.checkAllow(languages.get(0)));
         assertThat("Challenge do not allow java", !challenge.checkAllow(languages.get(1)));
     }
+
+    @Test
+    public void cantCreateTwoChallengesWithSameTitle() {
+    }
 }
