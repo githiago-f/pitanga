@@ -63,7 +63,7 @@ for project in "${projects[@]}"; do
 done
 
 # Build compilers and start the docker container
-docker build ./.docker -t pitanga/compilers:1.0.0 --file ./.docker/compilers.Dockerfile
+docker build ./docker -t pitanga/compilers:1.0.0 --file ./docker/compilers.Dockerfile
 
 docker compose build pitanga-code
 docker compose up -d nginx

@@ -12,7 +12,7 @@ RUN mvn dependency:go-offline -B
 
 COPY $PITANGA_CODE_PATH/src ./src
 COPY $PITANGA_CODE_PATH/pom.xml .
-COPY ./.docker/certs/kc/certificate.pem ./kc/certificate.pem
+COPY ./docker/certs/kc/certificate.pem ./kc/certificate.pem
 
 RUN mvn clean package -DskipTests
 

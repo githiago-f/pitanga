@@ -15,6 +15,11 @@ server {
     proxy_pass ${API_SERVICE};
   }
 
+  location /api/submissions {
+    rewrite ^/api/(.*)$ /$1 break;
+    proxy_pass ${API_SERVICE};
+  }
+
   location /auth {
     proxy_pass ${KC_URL};
 

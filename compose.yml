@@ -5,7 +5,7 @@ services:
       - pitangaweb
     volumes:
       - $CERT_BASE_PATH:/root
-      - ./.docker/nginx:/etc/nginx/templates
+      - ./docker/nginx:/etc/nginx/templates
     environment:
       API_SERVICE: https://pitanga-code:8443
       KC_URL: https://keycloak:8443
@@ -19,7 +19,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.50'
+          cpus: "0.5"
           memory: 512mb
 
   postgres:
@@ -29,7 +29,7 @@ services:
       POSTGRES_PASSWORD: $DB_PASSWORD
     volumes:
       - pitanga-drive:/var/lib/postgresql/data
-      - ./.docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pitangaweb
     ports:
@@ -37,12 +37,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
 
   keycloak:
     build:
-      dockerfile: ./.docker/keycloak.Dockerfile
+      dockerfile: ./docker/keycloak.Dockerfile
       context: .
     environment:
       KEYCLOAK_ADMIN: admin
@@ -65,12 +65,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 800mb
+          cpus: "0.5"
+          memory: 1G
 
   pitanga-code:
     build:
-      dockerfile: ./.docker/pitanga-code.Dockerfile
+      dockerfile: ./docker/pitanga-code.Dockerfile
       context: .
     environment:
       CHALLENGES_DB_URL: $CHALLENGES_DB_URL
