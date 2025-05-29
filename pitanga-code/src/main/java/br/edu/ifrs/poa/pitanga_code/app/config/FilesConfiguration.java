@@ -12,4 +12,8 @@ public class FilesConfiguration {
     private String stdin;
     private String stdout;
     private String stderr;
+
+    public String[] getFiles() {
+        return new String[] { stdin, stderr, stdout };
+    }
 }

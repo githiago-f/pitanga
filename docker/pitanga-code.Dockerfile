@@ -55,4 +55,4 @@ USER pitanga
 EXPOSE 8443
 LABEL version=0.0.2
 
-CMD ["java", "-jar", "pitanga-code-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "pitanga-code.jar"]
