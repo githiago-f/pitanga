@@ -13,9 +13,6 @@ services:
       SERVER_NAME: $COMMON_NAME
     ports:
       - 443:443
-    depends_on:
-      - keycloak
-      - pitanga-code
     deploy:
       resources:
         limits:
@@ -60,6 +57,7 @@ services:
       - pitangaweb
     depends_on:
       - postgres
+      - nginx
     volumes:
       - pitanga-drive:/opt/jboss/keycloak/standalone/data/
     deploy:
@@ -67,6 +65,29 @@ services:
         limits:
           cpus: "0.5"
           memory: 1G
+
+  pitanga-code-dev:
+    build:
+      dockerfile: ./docker/pitanga-code.Dockerfile
+      context: .
+    environment:
+      CHALLENGES_DB_URL: $CHALLENGES_DB_URL
+      DB_PASSWORD: $DB_PASSWORD
+      DB_USERNAME: $DB_USERNAME
+      SHOW_SQL: $SHOW_SQL
+      ISSUER_URI: $ISSUER_URI
+      JWK_SET_URI: $JWK_SET_URI
+    volumes:
+      - ./pitanga-code/target:/opt/app
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    privileged: true
+    cgroup_parent: docker.slice
+    networks:
+      - pitangaweb
+    depends_on:
+      - nginx
+      - postgres
+      - keycloak
 
   pitanga-code:
     build:
@@ -86,8 +107,8 @@ services:
     networks:
       - pitangaweb
     depends_on:
+      - nginx
       - postgres
-      - keycloak
 
 networks:
   pitangaweb:

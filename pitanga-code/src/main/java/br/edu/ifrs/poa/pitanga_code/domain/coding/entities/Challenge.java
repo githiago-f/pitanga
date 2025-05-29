@@ -3,7 +3,6 @@ package br.edu.ifrs.poa.pitanga_code.domain.coding.entities;
 import java.util.Set;
 
 import br.edu.ifrs.poa.pitanga_code.domain.coding.vo.Difficulty;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -28,25 +27,22 @@ public class Challenge {
     @Column(length = 100, name = "slug")
     private String slug;
 
-    @Nullable
-    @Column(nullable = true, columnDefinition = "TEXT")
-    private String customBaseCode;
-
     @Enumerated(EnumType.STRING)
     private Difficulty difficultyLevel;
 
     @ManyToMany(targetEntity = Language.class, fetch = FetchType.EAGER)
     private Set<Language> allowedLanguages;
 
-    public Challenge(String title, String description, String creator, String customBaseCode,
+    public Challenge(String title, String description, String creator,
             Difficulty difficultyLevel, Set<Language> allowedLanguages) {
         this.title = title;
         this.description = description;
         this.creator = creator;
-        this.customBaseCode = customBaseCode;
         this.difficultyLevel = difficultyLevel;
         this.allowedLanguages = allowedLanguages;
-        this.slug = title.toLowerCase().trim().substring(0, 100).replace(" ", "-");
+
+        int size = title.length();
+        this.slug = title.toLowerCase().trim().substring(0, size < 100 ? size : 100).replace(" ", "-");
     }
 
     public boolean checkAllow(Language language) {

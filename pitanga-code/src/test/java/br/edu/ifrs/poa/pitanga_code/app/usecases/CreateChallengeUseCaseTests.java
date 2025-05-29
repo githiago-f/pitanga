@@ -60,8 +60,7 @@ public class CreateChallengeUseCaseTests {
                 "Hello World!",
                 "Make your code to print hello world",
                 Difficulty.EASY,
-                List.of(),
-                Optional.empty());
+                List.of());
 
         Challenge challenge = useCase.execute(command);
         assertThat("Challenge allow golang", challenge.checkAllow(languages.get(0)));
@@ -77,15 +76,10 @@ public class CreateChallengeUseCaseTests {
                 "Hello World!",
                 "Make your code to print hello world",
                 Difficulty.EASY,
-                List.of(1l),
-                Optional.empty());
+                List.of(1l));
 
         Challenge challenge = useCase.execute(command);
         assertThat("Challenge allow golang", challenge.checkAllow(languages.get(0)));
         assertThat("Challenge do not allow java", !challenge.checkAllow(languages.get(1)));
-    }
-
-    @Test
-    public void cantCreateTwoChallengesWithSameTitle() {
     }
 }

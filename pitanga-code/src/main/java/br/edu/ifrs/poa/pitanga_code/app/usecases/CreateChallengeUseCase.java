@@ -40,7 +40,6 @@ public class CreateChallengeUseCase {
                 command.title(),
                 command.description(),
                 user.getName(),
-                command.baseCode().get(),
                 command.initialDifficultyLevel(),
                 languages);
 

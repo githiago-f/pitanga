@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +17,6 @@ public class IsolateBuilder {
 
     public static IsolateBuilder builder() {
         List<String> isolateCommand = new ArrayList<>();
-        isolateCommand.add("sudo");
         isolateCommand.add("isolate");
         return new IsolateBuilder(isolateCommand);
     }
@@ -30,6 +28,12 @@ public class IsolateBuilder {
 
     public IsolateBuilder init() {
         args.add("--init");
+        return this;
+    }
+
+    public IsolateBuilder clean() {
+        args.add("--cleanup");
+
         return this;
     }
 
@@ -125,8 +129,7 @@ public class IsolateBuilder {
     }
 
     public IsolateBuilder processesOrThreads(int maxProcessesOrThreads) {
-        args.add("-p");
-        args.add(String.valueOf(maxProcessesOrThreads));
+        args.add("--process=" + String.valueOf(maxProcessesOrThreads));
 
         return this;
     }

@@ -21,8 +21,6 @@ RUN mvn clean package -DskipTests
 #####################################
 FROM pitanga/compilers:1.0.0 AS compilers
 
-RUN mkdir -p /run/isolate && echo "/sys/fs/cgroup" > /run/isolate/cgroup
-
 WORKDIR /opt/app
 
 COPY --from=build /build/target/pitanga-code-0.0.1-SNAPSHOT.jar ./pitanga-code.jar
@@ -52,7 +50,9 @@ RUN useradd -u 1000 -m -r pitanga && \
 
 USER pitanga
 
+# RUN mkdir -p /run/isolate && echo "/sys/fs/cgroup" > /run/isolate/cgroup
+
 EXPOSE 8443
 LABEL version=0.0.2
 
-CMD ["java", "-jar", "pitanga-code.jar"]
+CMD ["java", "-jar", "pitanga-code-0.0.1-SNAPSHOT.jar"]

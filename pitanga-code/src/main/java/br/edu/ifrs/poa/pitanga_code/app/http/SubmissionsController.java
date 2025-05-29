@@ -1,5 +1,7 @@
 package br.edu.ifrs.poa.pitanga_code.app.http;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +25,7 @@ public class SubmissionsController {
     }
 
     @PostMapping(value = { "/{id}/tests" })
-    public void runTests() {
-        runChallengeTestsUseCase.execute();
+    public List<String> runTests() {
+        return runChallengeTestsUseCase.execute();
     }
 }

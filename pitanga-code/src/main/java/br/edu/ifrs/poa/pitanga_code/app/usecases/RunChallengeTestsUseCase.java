@@ -1,8 +1,11 @@
 package br.edu.ifrs.poa.pitanga_code.app.usecases;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -12,49 +15,73 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class RunChallengeTestsUseCase {
-    private void make(String file) throws IOException, InterruptedException {
-        log.info("Creating source files");
-        Process process = new ProcessBuilder().command(
-                "sudo", "touch", file, "&&",
-                "sudo", "chown", "$(whoami):", file).start();
-
-        process.waitFor();
-    }
-
-    private void writeOrError(String filePath, String data) throws IOException {
-        log.info("Inserting data into file");
-        Files.write(Path.of(filePath), data.getBytes());
-    }
-
-    public void execute() {
+    public List<String> execute() {
         try {
-            var out = IsolateBuilder.builder()
-                    .box(1)
+            int box = 1;
+            var createBox = IsolateBuilder.builder()
+                    .box(box)
                     .cg()
                     .init()
                     .build();
 
-            String workdir = out.out().getFirst().trim();
+            String workdir = createBox.out().getFirst().trim();
 
-            make(workdir + "/box/main.go");
-            writeOrError(workdir + "/box/main.go",
-                    "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}\n");
+            String sourceFile = workdir + "/box/main.go";
+            Process process = new ProcessBuilder("sh", "-c",
+                    "sudo touch " + sourceFile + " && sudo chown $(whoami): " + sourceFile).start();
+            process.waitFor();
+
+            Files.writeString(Path.of(sourceFile),
+                    "package main\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}\n",
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
 
             IsolateBuilder.builder()
                     .silent()
                     .cg()
-                    .box(1)
+                    .box(box)
                     .errToOut()
                     .in("/dev/null")
                     .time(100d)
                     .xTime(0d)
+                    .fileSize(1024 * 1024)
+                    .processesOrThreads(120)
                     .stack(10000)
                     .env("HOME=/tmp")
                     .env("GOCACHE=/tmp/.cache/go-build")
-                    .run("/usr/local/go-1.24.2/bin/go", "build", "main.go")
+                    .env("GO111MODULE=off")
+                    .run("/usr/local/go-1.24.2/bin/go", "build", "/box/main.go")
                     .build();
+
+            var execution = IsolateBuilder.builder()
+                    .silent()
+                    .cg()
+                    .box(box)
+                    .errToOut()
+                    .in("/dev/null")
+                    .time(100d)
+                    .xTime(0d)
+                    .fileSize(1024 * 1024)
+                    .processesOrThreads(120)
+                    .stack(10000)
+                    .env("HOME=/tmp")
+                    .env("GOCACHE=/tmp/.cache/go-build")
+                    .env("GO111MODULE=off")
+                    .run("./main")
+                    .build();
+
+            IsolateBuilder.builder()
+                    .silent()
+                    .box(box)
+                    .clean()
+                    .build();
+
+            return execution.out();
         } catch (InterruptedException | IOException e) {
             log.error("Error happened: ", e);
         }
+
+        return List.of();
     }
 }
