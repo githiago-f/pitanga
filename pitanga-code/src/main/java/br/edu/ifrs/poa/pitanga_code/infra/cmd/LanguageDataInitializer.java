@@ -1,6 +1,7 @@
 package br.edu.ifrs.poa.pitanga_code.infra.cmd;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
@@ -26,6 +27,7 @@ public class LanguageDataInitializer implements CommandLineRunner {
             Long id,
             String name,
             String source_file,
+            String[] environment,
             String compile_cmd,
             String run_command) {
 
@@ -33,8 +35,9 @@ public class LanguageDataInitializer implements CommandLineRunner {
             return Language.builder()
                     .id(id)
                     .name(name)
-                    .runCommand(run_command)
-                    .compileCMD(compile_cmd)
+                    .environment(environment)
+                    .runCommand(run_command.split(" "))
+                    .compileCMD(compile_cmd.split(" "))
                     .sourceFile(source_file)
                     .build();
         }

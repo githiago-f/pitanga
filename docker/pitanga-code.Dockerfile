@@ -56,3 +56,7 @@ EXPOSE 8443
 LABEL version=0.0.2
 
 CMD ["java", "-jar", "pitanga-code.jar"]
+
+FROM compilers AS development
+
+CMD ["sleep", "infinity"]

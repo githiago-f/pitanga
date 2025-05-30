@@ -5,25 +5,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
+
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 
 public interface SandboxProvider {
-    String execute(String code);
+    List<String> execute(SandboxRunRequest runRequest);
 
-    void cleanup();
+    void cleanup(Integer boxId);
 
-    void setBoxId(Integer boxId);
-
-    default void writeFile(String workdir, String file, String data) throws IOException {
-        Files.writeString(Path.of(workdir, file),
-                data,
+    default void writeFile(Path file, String data) throws IOException {
+        Files.writeString(file, data,
                 StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING);
     }
 
-    default void makeFile(String workdir, String file)
+    default void makeFile(Path file)
             throws IOException, InterruptedException {
-        String fileName = Path.of(workdir, file).toString();
+        String fileName = file.toString();
         Process process = new ProcessBuilder("sh", "-c",
                 "sudo touch " + fileName + " && sudo chown $(whoami): " + fileName).start();
         process.waitFor();

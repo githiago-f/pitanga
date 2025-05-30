@@ -31,7 +31,10 @@ public class CreateChallengeUseCaseTests {
         Mockito.when(challengesRepository.save(Mockito.any(Challenge.class)))
                 .thenAnswer(i -> i.getArguments()[0]);
 
-        var lang = Language.builder().sourceFile("").runCommand("").compileCMD("");
+        var lang = Language.builder()
+                .sourceFile("")
+                .runCommand(new String[] { "" })
+                .compileCMD(new String[] { "" });
 
         languages.add(lang.id(1l).name("golang").build());
         languages.add(lang.id(2l).name("java").build());

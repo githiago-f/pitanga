@@ -7,7 +7,7 @@ services:
       - $CERT_BASE_PATH:/root
       - ./docker/nginx:/etc/nginx/templates
     environment:
-      API_SERVICE: https://pitanga-code:8443
+      API_SERVICE: https://pitanga-code-dev:8443
       KC_URL: https://keycloak:8443
       PORT: $PORT
       SERVER_NAME: $COMMON_NAME
@@ -70,6 +70,7 @@ services:
     build:
       dockerfile: ./docker/pitanga-code.Dockerfile
       context: .
+      target: development
     environment:
       CHALLENGES_DB_URL: $CHALLENGES_DB_URL
       DB_PASSWORD: $DB_PASSWORD
@@ -78,7 +79,7 @@ services:
       ISSUER_URI: $ISSUER_URI
       JWK_SET_URI: $JWK_SET_URI
     volumes:
-      - ./pitanga-code/target:/opt/app
+      - ./pitanga-code:/opt/app
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
     cgroup_parent: docker.slice

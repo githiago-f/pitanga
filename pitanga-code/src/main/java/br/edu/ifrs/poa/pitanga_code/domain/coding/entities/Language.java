@@ -19,6 +19,9 @@ public class Language {
 
     private String name;
     private String sourceFile;
-    private String compileCMD;
-    private String runCommand;
+
+    private String[] compileCMD;
+
+    private String[] runCommand;
+    private String[] environment;
 }

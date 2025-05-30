@@ -1,6 +1,8 @@
 package br.edu.ifrs.poa.pitanga_code.infra.sandbox;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -9,6 +11,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import br.edu.ifrs.poa.pitanga_code.app.config.FilesConfiguration;
 // import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.IsolateBuilder;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,13 +23,10 @@ public class IsolateSandboxProvider implements SandboxProvider {
     // private final LimitsConfiguration limits;
     private final FilesConfiguration files;
 
-    private Integer boxId;
+    private final String ISOLATE_PATH = "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"";
 
-    public void setBoxId(Integer boxId) {
-        this.boxId = boxId;
-    }
-
-    private String createBox() throws InterruptedException, IOException {
+    private String createBox(Integer boxId)
+            throws InterruptedException, IOException {
         var box = IsolateBuilder.builder()
                 .box(boxId)
                 .cg()
@@ -39,11 +39,12 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return box.out().getFirst().trim();
     }
 
-    private List<String> build() throws InterruptedException, IOException {
-        var buildOutput = IsolateBuilder.builder()
+    private List<String> build(SandboxRunRequest runRequest)
+            throws InterruptedException, IOException {
+        IsolateBuilder isolate = IsolateBuilder.builder()
                 .silent()
                 .cg()
-                .box(boxId)
+                .box(runRequest.boxId())
                 .errToOut()
                 .in("/dev/null")
                 .time(100d)
@@ -52,61 +53,67 @@ public class IsolateSandboxProvider implements SandboxProvider {
                 .processesOrThreads(120)
                 .stack(10000)
                 .env("HOME=/tmp")
-                .env("GOCACHE=/tmp/.cache/go-build")
-                .env("GO111MODULE=off")
-                .run("/usr/local/go-1.24.2/bin/go", "build", "/box/main.go")
-                .build();
+                .env(ISOLATE_PATH);
 
-        return buildOutput.out();
+        for (String envVar : runRequest.getEnv()) {
+            isolate.env(envVar);
+        }
+
+        return isolate.run(runRequest.getCompile()).build().out();
     }
 
-    private List<String> run() throws InterruptedException, IOException {
-        var execution = IsolateBuilder.builder()
+    private List<String> run(SandboxRunRequest runRequest, String wordkir)
+            throws InterruptedException, IOException {
+        IsolateBuilder isolate = IsolateBuilder.builder()
                 .silent()
                 .cg()
-                .box(boxId)
+                .box(runRequest.boxId())
                 .errToOut()
-                .in("/dev/null")
                 .time(100d)
                 .xTime(0d)
                 .fileSize(1024 * 1024)
                 .processesOrThreads(120)
                 .stack(10000)
                 .env("HOME=/tmp")
-                .env("GOCACHE=/tmp/.cache/go-build")
-                .env("GO111MODULE=off")
-                .run("./main")
-                .build();
+                .env(ISOLATE_PATH);
 
-        return execution.out();
+        for (String envVar : runRequest.getEnv()) {
+            isolate.env(envVar);
+        }
+
+        String[] command = runRequest.getRun();
+        return isolate.run(command).build().out();
     }
 
     @Override
-    public String execute(String code) {
+    public List<String> execute(SandboxRunRequest runRequest) {
         try {
-            String workdir = createBox();
+            String workdir = createBox(runRequest.boxId());
 
             for (String file : files.getFiles()) {
-                makeFile(workdir, file);
+                makeFile(Path.of(workdir, file));
             }
 
-            makeFile(workdir, "box/main.go");
-            writeFile(workdir, "box/main.go", code);
+            Path sourceFile = Path.of(workdir, "box", runRequest.language().getSourceFile());
+            makeFile(sourceFile);
+            writeFile(sourceFile, runRequest.code());
 
-            StringBuilder builder = new StringBuilder();
-            build().forEach(builder::append);
-            run().forEach(builder::append);
+            List<String> lines = new ArrayList<>();
+            if (runRequest.language().getCompileCMD().length == 0) {
+                build(runRequest).forEach(lines::add);
+            }
+            run(runRequest, workdir).forEach(lines::add);
 
-            return builder.toString();
+            return lines;
         } catch (IOException | InterruptedException e) {
             log.error("Error on processing", e);
         }
 
-        return "Failed";
+        return List.of("Failed");
     }
 
     @Override
-    public void cleanup() {
+    public void cleanup(Integer boxId) {
         try {
             IsolateBuilder.builder()
                     .silent()
