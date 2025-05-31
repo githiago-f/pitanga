@@ -1,4 +1,4 @@
-package br.edu.ifrs.poa.pitanga_code.app.commands;
+package br.edu.ifrs.poa.pitanga_code.app.dtos;
 
 import java.util.List;
 

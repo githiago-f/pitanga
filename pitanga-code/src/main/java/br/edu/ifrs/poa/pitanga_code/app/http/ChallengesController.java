@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.ifrs.poa.pitanga_code.app.commands.CreateChallengeCommand;
+import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateChallengeCommand;
 import br.edu.ifrs.poa.pitanga_code.app.usecases.CreateChallengeUseCase;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Challenge;
 import lombok.AllArgsConstructor;

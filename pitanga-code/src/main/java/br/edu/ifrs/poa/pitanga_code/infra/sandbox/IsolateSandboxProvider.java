@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import br.edu.ifrs.poa.pitanga_code.app.config.FilesConfiguration;
-// import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
+import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.IsolateBuilder;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestScope
 @RequiredArgsConstructor
 public class IsolateSandboxProvider implements SandboxProvider {
-    // private final LimitsConfiguration limits;
+    private final LimitsConfiguration limits;
     private final FilesConfiguration files;
 
     private final String ISOLATE_PATH = "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"";
@@ -39,21 +39,25 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return box.out().getFirst().trim();
     }
 
-    private List<String> build(SandboxRunRequest runRequest)
-            throws InterruptedException, IOException {
-        IsolateBuilder isolate = IsolateBuilder.builder()
+    private IsolateBuilder getIsolateBuilder() {
+        return IsolateBuilder.builder()
                 .silent()
                 .cg()
-                .box(runRequest.boxId())
                 .errToOut()
-                .in("/dev/null")
-                .time(100d)
-                .xTime(0d)
-                .fileSize(1024 * 1024)
-                .processesOrThreads(120)
-                .stack(10000)
+                .time(limits.getCpuTime())
+                .xTime(limits.getExtraCpuTime())
+                .fileSize(limits.getFileSize())
+                .processesOrThreads(limits.getProcessesAndThreads())
+                .stack(limits.getStack())
                 .env("HOME=/tmp")
                 .env(ISOLATE_PATH);
+    }
+
+    private List<String> build(SandboxRunRequest runRequest)
+            throws InterruptedException, IOException {
+        IsolateBuilder isolate = getIsolateBuilder()
+                .box(runRequest.boxId())
+                .in("/dev/null");
 
         for (String envVar : runRequest.getEnv()) {
             isolate.env(envVar);
@@ -62,20 +66,11 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return isolate.run(runRequest.getCompile()).build().out();
     }
 
-    private List<String> run(SandboxRunRequest runRequest, String wordkir)
+    private List<String> run(SandboxRunRequest runRequest)
             throws InterruptedException, IOException {
-        IsolateBuilder isolate = IsolateBuilder.builder()
-                .silent()
-                .cg()
+        IsolateBuilder isolate = getIsolateBuilder()
                 .box(runRequest.boxId())
-                .errToOut()
-                .time(100d)
-                .xTime(0d)
-                .fileSize(1024 * 1024)
-                .processesOrThreads(120)
-                .stack(10000)
-                .env("HOME=/tmp")
-                .env(ISOLATE_PATH);
+                .in(Path.of("/box", files.getStdin()).toString());
 
         for (String envVar : runRequest.getEnv()) {
             isolate.env(envVar);
@@ -85,24 +80,34 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return isolate.run(command).build().out();
     }
 
+    private void persistInputFile(SandboxRunRequest runRequest, String workdir)
+            throws IOException {
+        StringBuilder builder = new StringBuilder();
+        runRequest.inputLines().forEach(line -> builder.append(line).append('\n'));
+        Path inputFile = Path.of(workdir, "box", files.getStdin());
+        writeFile(inputFile, builder.toString());
+    }
+
     @Override
     public List<String> execute(SandboxRunRequest runRequest) {
         try {
             String workdir = createBox(runRequest.boxId());
 
             for (String file : files.getFiles()) {
-                makeFile(Path.of(workdir, file));
+                makeFile(Path.of(workdir, "box", file));
             }
 
             Path sourceFile = Path.of(workdir, "box", runRequest.language().getSourceFile());
             makeFile(sourceFile);
             writeFile(sourceFile, runRequest.code());
 
+            persistInputFile(runRequest, workdir);
+
             List<String> lines = new ArrayList<>();
-            if (runRequest.language().getCompileCMD().length == 0) {
+            if (runRequest.language().getCompileCMD().length != 0) {
                 build(runRequest).forEach(lines::add);
             }
-            run(runRequest, workdir).forEach(lines::add);
+            run(runRequest).forEach(lines::add);
 
             return lines;
         } catch (IOException | InterruptedException e) {

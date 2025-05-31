@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-import br.edu.ifrs.poa.pitanga_code.app.commands.CreateChallengeCommand;
+import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateChallengeCommand;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Challenge;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.ChallengesRepository;

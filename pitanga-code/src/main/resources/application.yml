@@ -37,14 +37,13 @@ pitanga:
       stdout: stdout.txt
       stderr: stderr.txt
     limits:
-      retry: ${MAX_EXECUTION_RETRY_ON_INTERNAL_ERROR:10}
-      retry-milis: ${EXECUTION_RETRY_DELAY:100}
-
-      cpu-time: ${CPU_TIME_LIMIT:5}
-      extra-cpu-time: ${CPU_EXTRA_TIME:1}
+      cpu-time: ${CPU_TIME_LIMIT:30}
+      extra-cpu-time: ${CPU_EXTRA_TIME:10}
       wall-time: ${WALL_TIME_LIMIT:10}
       memory: ${MEMORY_LIMIT:128000}
-      stack: ${STACK_LIMIT:64000}
+      stack: ${STACK_LIMIT:10000}
+      file-size: ${MAX_FILE_SIZE:1048576}
+      processes-and-threads: ${MAX_PROCESSES_AND_OR_THREADS:120}
 
       # when creating new challenges, this will be used as max on validation
       max-cpu-time: ${MAX_CPU_TIME_LIMIT:15}

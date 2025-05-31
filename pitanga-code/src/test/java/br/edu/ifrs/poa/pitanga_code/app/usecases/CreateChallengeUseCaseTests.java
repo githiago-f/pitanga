@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.edu.ifrs.poa.pitanga_code.app.commands.CreateChallengeCommand;
+import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateChallengeCommand;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Challenge;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.ChallengesRepository;

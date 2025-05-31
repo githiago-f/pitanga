@@ -5,6 +5,5 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmitSolutionUseCase {
     public void execute() {
-        // TODO Auto-generated method stub
     }
 }

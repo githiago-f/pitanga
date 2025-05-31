@@ -5,12 +5,14 @@ import java.util.Set;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.vo.Difficulty;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @Table(name = "challenges", indexes = {
         @Index(unique = true, columnList = "slug")
 })
+@NoArgsConstructor
 public class Challenge {
     @Id
     @Column(name = "challenge_id")
@@ -42,7 +44,10 @@ public class Challenge {
         this.allowedLanguages = allowedLanguages;
 
         int size = title.length();
-        this.slug = title.toLowerCase().trim().substring(0, size < 100 ? size : 100).replace(" ", "-");
+        this.slug = title.toLowerCase()
+                .substring(0, size < 100 ? size : 100)
+                .trim()
+                .replace(" ", "-");
     }
 
     public boolean checkAllow(Language language) {
