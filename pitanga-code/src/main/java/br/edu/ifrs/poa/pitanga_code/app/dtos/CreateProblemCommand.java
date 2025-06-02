@@ -2,9 +2,9 @@ package br.edu.ifrs.poa.pitanga_code.app.dtos;
 
 import java.util.List;
 
-import br.edu.ifrs.poa.pitanga_code.domain.coding.vo.Difficulty;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.Difficulty;
 
-public record CreateChallengeCommand(
+public record CreateProblemCommand(
         String title,
         String description,
         Difficulty initialDifficultyLevel,

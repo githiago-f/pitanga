@@ -6,7 +6,6 @@ import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 
 public record SandboxRunRequest(
         String code,
-        Integer boxId,
         List<String> inputLines,
         Language language) {
 

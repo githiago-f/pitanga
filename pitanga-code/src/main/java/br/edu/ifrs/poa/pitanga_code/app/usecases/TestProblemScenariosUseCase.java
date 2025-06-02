@@ -7,11 +7,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import br.edu.ifrs.poa.pitanga_code.app.dtos.RunTestsCommand;
-import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Challenge;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
-import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.ChallengesRepository;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
-import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.LoadBalanceAlgorithmProvider;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequestScope
 @RequiredArgsConstructor
-public class RunChallengeTestsUseCase {
+public class TestProblemScenariosUseCase {
     private final LanguagesRepository languagesRepository;
-    private final ChallengesRepository challengesRepository;
+    private final CreateProblemsRepository challengesRepository;
     private final SandboxProvider sandboxProvider;
-    private final LoadBalanceAlgorithmProvider hashProvider;
 
     public List<String> execute(RunTestsCommand code) {
-        Optional<Challenge> challenge = challengesRepository.findById(code.challengeId());
+        Optional<Problem> challenge = challengesRepository.findById(code.challengeId());
         Optional<Language> language = languagesRepository.findById(code.languageId());
 
         if (challenge.isEmpty() || language.isEmpty()) {
@@ -39,18 +37,8 @@ public class RunChallengeTestsUseCase {
             return List.of("Cannot use this language");
         }
 
-        int boxId = hashProvider.getNumber();
+        SandboxRunRequest request = new SandboxRunRequest(code.code(), code.inputs(), language.get());
 
-        try {
-            SandboxRunRequest request = new SandboxRunRequest(
-                    code.code(),
-                    boxId,
-                    code.inputs(),
-                    language.get());
-
-            return sandboxProvider.execute(request);
-        } finally {
-            sandboxProvider.cleanup(boxId);
-        }
+        return sandboxProvider.execute(request);
     }
 }

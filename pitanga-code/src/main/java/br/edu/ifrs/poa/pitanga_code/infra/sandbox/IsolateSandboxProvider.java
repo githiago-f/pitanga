@@ -11,6 +11,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import br.edu.ifrs.poa.pitanga_code.app.config.FilesConfiguration;
 import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.IsolateBuilder;
+import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.LoadBalanceAlgorithmProvider;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class IsolateSandboxProvider implements SandboxProvider {
     private final LimitsConfiguration limits;
     private final FilesConfiguration files;
+    private final LoadBalanceAlgorithmProvider hashProvider;
 
     private final String ISOLATE_PATH = "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"";
 
@@ -53,10 +55,10 @@ public class IsolateSandboxProvider implements SandboxProvider {
                 .env(ISOLATE_PATH);
     }
 
-    private List<String> build(SandboxRunRequest runRequest)
+    private List<String> build(SandboxRunRequest runRequest, int boxId)
             throws InterruptedException, IOException {
         IsolateBuilder isolate = getIsolateBuilder()
-                .box(runRequest.boxId())
+                .box(boxId)
                 .in("/dev/null");
 
         for (String envVar : runRequest.getEnv()) {
@@ -66,10 +68,10 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return isolate.run(runRequest.getCompile()).build().out();
     }
 
-    private List<String> run(SandboxRunRequest runRequest)
+    private List<String> run(SandboxRunRequest runRequest, int boxId)
             throws InterruptedException, IOException {
         IsolateBuilder isolate = getIsolateBuilder()
-                .box(runRequest.boxId())
+                .box(boxId)
                 .in(Path.of("/box", files.getStdin()).toString());
 
         for (String envVar : runRequest.getEnv()) {
@@ -90,8 +92,10 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
     @Override
     public List<String> execute(SandboxRunRequest runRequest) {
+        int boxId = hashProvider.getNumber();
+
         try {
-            String workdir = createBox(runRequest.boxId());
+            String workdir = createBox(boxId);
 
             for (String file : files.getFiles()) {
                 makeFile(Path.of(workdir, "box", file));
@@ -105,13 +109,15 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
             List<String> lines = new ArrayList<>();
             if (runRequest.language().getCompileCMD().length != 0) {
-                build(runRequest).forEach(lines::add);
+                build(runRequest, boxId).forEach(lines::add);
             }
-            run(runRequest).forEach(lines::add);
+            run(runRequest, boxId).forEach(lines::add);
 
             return lines;
         } catch (IOException | InterruptedException e) {
             log.error("Error on processing", e);
+        } finally {
+            cleanup(boxId);
         }
 
         return List.of("Failed");

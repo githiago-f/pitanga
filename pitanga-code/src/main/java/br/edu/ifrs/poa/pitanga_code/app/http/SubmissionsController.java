@@ -5,8 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 import br.edu.ifrs.poa.pitanga_code.app.dtos.RunTestsCommand;
-import br.edu.ifrs.poa.pitanga_code.app.usecases.RunChallengeTestsUseCase;
-import br.edu.ifrs.poa.pitanga_code.app.usecases.SubmitSolutionUseCase;
+import br.edu.ifrs.poa.pitanga_code.app.usecases.TestProblemScenariosUseCase;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,16 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @RequestMapping({ "/submissions" })
 public class SubmissionsController {
-    private final RunChallengeTestsUseCase runChallengeTestsUseCase;
-    private final SubmitSolutionUseCase submitSolutionUseCase;
+    private final TestProblemScenariosUseCase runChallengeTestsUseCase;
 
     @PostMapping
     public void submit() {
-        submitSolutionUseCase.execute();
+        // TODO implement submissions handler
     }
 
     @PostMapping(value = { "/test" })
-    public List<String> runTests(@RequestBody RunTestsCommand code) {
+    public List<String> runExamples(@RequestBody RunTestsCommand code) {
         return runChallengeTestsUseCase.execute(code);
     }
 }
