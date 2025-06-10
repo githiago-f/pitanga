@@ -1,7 +1,6 @@
 services:
   nginx:
     image: nginx
-    restart: always
     networks:
       - pitangaweb
     volumes:
@@ -18,11 +17,10 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 512mb
+          memory: 128mb
 
   postgres:
     image: postgres
-    restart: always
     container_name: postgres-container
     environment:
       POSTGRES_PASSWORD: $DB_PASSWORD
@@ -37,7 +35,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 1G
+          memory: 512mb
 
   keycloak:
     build:
@@ -55,7 +53,6 @@ services:
       # https://localhost/auth/realms/master there.
       #
       # KEYCLOAK_FRONTEND_URL: https://keycloak:8443/auth
-    restart: always
     networks:
       - pitangaweb
     depends_on:
@@ -67,7 +64,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 1G
+          memory: 512mb
 
   pitanga-code-dev:
     build:
@@ -86,6 +83,8 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
     cgroup_parent: docker.slice
+    tty: true
+    stdin_open: true
     networks:
       - pitangaweb
     depends_on:
@@ -97,6 +96,7 @@ services:
     build:
       dockerfile: ./docker/pitanga-code.Dockerfile
       context: .
+      target: production
     environment:
       CHALLENGES_DB_URL: $CHALLENGES_DB_URL
       DB_PASSWORD: $DB_PASSWORD

@@ -19,12 +19,16 @@ RUN mvn clean package -DskipTests
 #####################################
 # Stage 2: Create the Runtime Image #
 #####################################
-FROM pitanga/compilers:1.0.0 AS compilers
+FROM pitanga/compilers:1.0.0 AS production
 
 WORKDIR /opt/app
 
-COPY --from=build /build/target/pitanga-code-0.0.1-SNAPSHOT.jar ./pitanga-code.jar
+COPY --from=build /build/target/pitanga-code-*.jar ./pitanga-code.jar
 RUN mkdir -p ./kc && mkdir -p ./tmp
+
+COPY ./docker/isolate/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 COPY --from=build /build/kc/certificate.pem ./kc/certificate.pem
 
 ENV JAVA_HOME="/usr/local/jdk21"
@@ -50,13 +54,12 @@ RUN useradd -u 1000 -m -r pitanga && \
 
 USER pitanga
 
-# RUN mkdir -p /run/isolate && echo "/sys/fs/cgroup" > /run/isolate/cgroup
-
 EXPOSE 8443
 LABEL version=0.0.2
 
+ENTRYPOINT [ "/entrypoint.sh" ]
 CMD ["java", "-jar", "pitanga-code.jar"]
 
-FROM compilers AS development
+FROM production AS development
 
 CMD ["sleep", "infinity"]
