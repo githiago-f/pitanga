@@ -4,7 +4,7 @@
     "name": "Assembly (NASM)",
     "source_file": "main.asm",
     "environment": [],
-    "compile_cmd": "/usr/local/nasm-$VERSION/bin/nasmld -f elf64 $ARGS main.asm",
+    "compile_cmd": "/usr/local/nasm-2.14.02/bin/nasmld -f elf64 main.asm",
     "run_command": "./$BINARY_FILE"
   },
   {
@@ -14,22 +14,6 @@
     "compile_cmd": "",
     "environment": [],
     "run_command": "/usr/local/bash-5.0/bin/bash script.sh"
-  },
-  {
-    "id": 3,
-    "name": "C (GCC 7.4.0)",
-    "source_file": "main.c",
-    "environment": [],
-    "compile_cmd": "/usr/local/gcc-7.4.0/bin/gcc main.c",
-    "run_command": "./a.out"
-  },
-  {
-    "id": 4,
-    "name": "C (GCC 8.3.0)",
-    "source_file": "main.c",
-    "environment": [],
-    "compile_cmd": "/usr/local/gcc-8.3.0/bin/gcc main.c",
-    "run_command": "./a.out"
   },
   {
     "id": 5,
@@ -43,10 +27,7 @@
     "id": 6,
     "name": "Go",
     "source_file": "main.go",
-    "environment": [
-      "GOCACHE=/tmp/.cache/go-build",
-      "GO111MODULE=off"
-    ],
+    "environment": ["GOCACHE=/tmp/.cache/go-build", "GO111MODULE=off"],
     "compile_cmd": "/usr/local/go-1.24.2/bin/go build main.go",
     "run_command": "./main"
   },
@@ -55,8 +36,8 @@
     "name": "Java",
     "source_file": "Main.java",
     "environment": [],
-    "compile_cmd": "/usr/local/jdk21/bin/javac Main.java",
-    "run_command": "/usr/local/jdk21/bin/java Main"
+    "compile_cmd": "/usr/bin/javac Main.java",
+    "run_command": "/usr/bin/java Main"
   },
   {
     "id": 8,
@@ -64,20 +45,20 @@
     "source_file": "script.js",
     "environment": [],
     "compile_cmd": "",
-    "run_command": "/usr/local/node-12.14.0/bin/node script.js"
+    "run_command": "/usr/bin/node script.js"
   },
   {
     "id": 9,
     "name": "Lua",
     "source_file": "script.lua",
     "environment": [],
-    "compile_cmd": "/usr/local/lua-5.3.5/luac53 script.lua",
-    "run_command": "/usr/local/lua-5.3.5/lua53 ./luac.out"
+    "compile_cmd": "/usr/bin/luac script.lua",
+    "run_command": "/usr/bin/lua ./luac.out"
   },
   {
     "id": 10,
     "name": "SQLite",
-    "source_file": "program.sql",
+    "source_file": "script.sql",
     "environment": [],
     "compile_cmd": "",
     "run_command": "/bin/cat script.sql | /usr/bin/sqlite3 db.sqlite"
@@ -96,7 +77,7 @@
     "source_file": "script.py",
     "environment": [],
     "compile_cmd": "",
-    "run_command": "/usr/local/python-3.8.1/bin/python3 script.py"
+    "run_command": "/usr/local/python-3.13.2/bin/python3 script.py"
   },
   {
     "id": 13,
@@ -104,6 +85,6 @@
     "source_file": "script.ts",
     "environment": [],
     "compile_cmd": "/usr/bin/tsc script.ts",
-    "run_command": "/usr/local/node-12.14.0/bin/node script.js"
+    "run_command": "/usr/bin/node script.js"
   }
 ]

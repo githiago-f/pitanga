@@ -1,7 +1,10 @@
 package br.edu.ifrs.poa.pitanga_code.infra.sandbox;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +30,18 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
     private final String ISOLATE_PATH = "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"";
 
-    private String createBox(Integer boxId)
-            throws InterruptedException, IOException {
+    private void writeFile(Path file, String data) throws IOException {
+        Files.writeString(file, data,
+                StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    private void makeFiles(int boxId, SandboxRunRequest request) throws IOException, InterruptedException {
+        Path tempDir = Files.createTempDirectory("pitanga/" + boxId);
+    }
+
+    private String createBox(Integer boxId) throws InterruptedException, IOException {
         var box = IsolateBuilder.builder()
                 .box(boxId)
                 .cg()
@@ -72,7 +85,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
             throws InterruptedException, IOException {
         IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
-                .in(Path.of("/box", files.getStdin()).toString());
+                .in(Path.of("/" + files.getStdin()).toString());
 
         for (String envVar : runRequest.getEnv()) {
             isolate.env(envVar);
@@ -82,30 +95,13 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return isolate.run(command).build().out();
     }
 
-    private void persistInputFile(SandboxRunRequest runRequest, String workdir)
-            throws IOException {
-        StringBuilder builder = new StringBuilder();
-        runRequest.inputLines().forEach(line -> builder.append(line).append('\n'));
-        Path inputFile = Path.of(workdir, "box", files.getStdin());
-        writeFile(inputFile, builder.toString());
-    }
-
     @Override
     public List<String> execute(SandboxRunRequest runRequest) {
         int boxId = hashProvider.getNumber();
 
         try {
             String workdir = createBox(boxId);
-
-            for (String file : files.getFiles()) {
-                makeFile(Path.of(workdir, "box", file));
-            }
-
-            Path sourceFile = Path.of(workdir, "box", runRequest.language().getSourceFile());
-            makeFile(sourceFile);
-            writeFile(sourceFile, runRequest.code());
-
-            persistInputFile(runRequest, workdir);
+            Path rootDir = Path.of(workdir, "root");
 
             List<String> lines = new ArrayList<>();
             if (runRequest.language().getCompileCMD().length != 0) {
@@ -123,11 +119,11 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return List.of("Failed");
     }
 
-    @Override
     public void cleanup(Integer boxId) {
         try {
             IsolateBuilder.builder()
                     .silent()
+                    .cg()
                     .box(boxId)
                     .clean()
                     .build();

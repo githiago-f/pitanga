@@ -22,7 +22,7 @@ spring:
   jpa:
     show-sql: ${SHOW_SQL:true}
     hibernate:
-      ddl-auto: drop-and-create
+      ddl-auto: update
   security:
     oauth2:
       resourceserver:
