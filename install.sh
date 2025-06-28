@@ -1,7 +1,12 @@
 CommonName="localhost"
 
-KEY_PATH=./core/src/main/resources/certs/key.pem
-CERT_PATH=./core/src/main/resources/certs/certificate.pem
+CERT_PATH=./core/src/main/resources/certs
+if (!(test -d $CERT_PATH)); then
+    mkdir $CERT_PATH;
+fi
+
+KEY_PATH="$CERT_PATH/key.pem"
+CERT_PATH="$CERT_PATH/certificate.pem"
 
 if (!(test -e $CERT_PATH)); then
     openssl req -x509 -newkey rsa:4096 -nodes -keyout $KEY_PATH -out $CERT_PATH \
