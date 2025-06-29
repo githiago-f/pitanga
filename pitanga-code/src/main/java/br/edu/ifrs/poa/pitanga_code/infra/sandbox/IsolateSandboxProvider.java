@@ -1,18 +1,15 @@
 package br.edu.ifrs.poa.pitanga_code.infra.sandbox;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 
-import br.edu.ifrs.poa.pitanga_code.app.config.FilesConfiguration;
+import br.edu.ifrs.poa.pitanga_code.app.config.EnvironmentConfiguration;
 import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
+import br.edu.ifrs.poa.pitanga_code.infra.lib.CmdHelper;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.IsolateBuilder;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.LoadBalanceAlgorithmProvider;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
@@ -21,44 +18,35 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@RequestScope
 @RequiredArgsConstructor
 public class IsolateSandboxProvider implements SandboxProvider {
     private final LimitsConfiguration limits;
-    private final FilesConfiguration files;
+    private final EnvironmentConfiguration environment;
     private final LoadBalanceAlgorithmProvider hashProvider;
 
-    private final String ISOLATE_PATH = "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"";
+    private void writeFiles(SandboxRunRequest request, Path path) throws IOException {
+        String sourceFile = request.language().getSourceFile();
+        Path sourcePath = path.resolve("box").resolve(sourceFile);
 
-    private void writeFile(Path file, String data) throws IOException {
-        Files.writeString(file, data,
-                StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-    }
+        CmdHelper.Output res = CmdHelper.builder()
+                .run("sudo", "touch", sourcePath.toString())
+                .and()
+                .run("echo '" + request.code() + "'")
+                .pipe()
+                .run("sudo", "tee", sourcePath.toString())
+                .build();
 
-    private Path createTempFiles(int boxId, SandboxRunRequest request)
-            throws IOException, InterruptedException {
-        Path tempDir = Files.createTempDirectory(Integer.toString(boxId));
-        Path srcFile = tempDir.resolve(request.language().getSourceFile());
-        Path inFile = tempDir.resolve(files.getStdin());
-
-        writeFile(srcFile, request.code());
-
-        StringBuilder builder = new StringBuilder();
-        request.inputLines().forEach(line -> builder.append(line).append('\n'));
-
-        writeFile(inFile, builder.toString());
-
-        return tempDir;
+        String out = res.exit() != 0 ? res.err() : res.out();
+        log.error("Cmd exited with {} :: {}", res.exit(), out);
     }
 
     private String createBox(Integer boxId) throws InterruptedException, IOException {
-        var box = IsolateBuilder.builder()
-                .box(boxId)
-                .cg()
-                .init()
-                .build();
+        var builder = IsolateBuilder.builder().box(boxId).init();
+        if (environment.getUseCgroups()) {
+            builder.cg();
+        }
+
+        var box = builder.build();
 
         if (box.error().size() != 0)
             throw new RuntimeException(box.errorAsString());
@@ -66,24 +54,28 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return box.out().getFirst().trim();
     }
 
-    private IsolateBuilder getIsolateBuilder(Path tempDir) {
-        return IsolateBuilder.builder()
+    private IsolateBuilder getIsolateBuilder() {
+        IsolateBuilder builder = IsolateBuilder.builder()
                 .silent()
-                .cg()
                 .errToOut()
-                .dir(tempDir.toString())
                 .time(limits.getCpuTime())
                 .xTime(limits.getExtraCpuTime())
                 .fileSize(limits.getFileSize())
                 .processesOrThreads(limits.getProcessesAndThreads())
                 .stack(limits.getStack())
                 .env("HOME=/tmp")
-                .env(ISOLATE_PATH);
+                .env(environment.getDefaultPath());
+
+        if (environment.getUseCgroups()) {
+            builder.cg();
+        }
+
+        return builder;
     }
 
-    private List<String> build(SandboxRunRequest runRequest, int boxId, Path tempDir)
+    private List<String> build(SandboxRunRequest runRequest, int boxId)
             throws InterruptedException, IOException {
-        IsolateBuilder isolate = getIsolateBuilder(tempDir)
+        IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
                 .in("/dev/null");
 
@@ -91,21 +83,31 @@ public class IsolateSandboxProvider implements SandboxProvider {
             isolate.env(envVar);
         }
 
-        return isolate.run(runRequest.getCompile()).build().out();
+        var box = isolate.run(runRequest.getCompile()).build();
+
+        if (box.error().size() != 0)
+            throw new RuntimeException(box.errorAsString());
+
+        return box.out();
     }
 
-    private List<String> run(SandboxRunRequest runRequest, int boxId, Path tempDir)
+    private List<String> run(SandboxRunRequest runRequest, int boxId)
             throws InterruptedException, IOException {
-        IsolateBuilder isolate = getIsolateBuilder(tempDir)
-                .box(boxId)
-                .in(Path.of("/" + files.getStdin()).toString());
+        IsolateBuilder isolate = getIsolateBuilder()
+                .box(boxId);
 
         for (String envVar : runRequest.getEnv()) {
             isolate.env(envVar);
         }
 
         String[] command = runRequest.getRun();
-        return isolate.run(command).build().out();
+
+        var box = isolate.run(command).build();
+
+        if (box.error().size() != 0)
+            throw new RuntimeException(box.errorAsString());
+
+        return box.out();
     }
 
     @Override
@@ -113,22 +115,22 @@ public class IsolateSandboxProvider implements SandboxProvider {
         int boxId = hashProvider.getNumber();
 
         try {
-            String boxDir = createBox(boxId);
+            Path boxDir = Path.of(createBox(boxId));
             log.info("Box created at {}", boxDir);
 
-            Path tempDir = createTempFiles(boxId, runRequest);
+            writeFiles(runRequest, boxDir);
 
             List<String> lines = new ArrayList<>();
             if (runRequest.language().getCompileCMD().length != 0) {
-                build(runRequest, boxId, tempDir).forEach(lines::add);
+                build(runRequest, boxId).forEach(lines::add);
             }
-            run(runRequest, boxId, tempDir).forEach(lines::add);
+            run(runRequest, boxId).forEach(lines::add);
 
             return lines;
         } catch (IOException | InterruptedException e) {
             log.error("Error on processing", e);
         } finally {
-            // cleanup(boxId);
+            cleanup(boxId);
         }
 
         return List.of("Failed");
@@ -136,12 +138,16 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
     public void cleanup(Integer boxId) {
         try {
-            IsolateBuilder.builder()
+            IsolateBuilder isolateBuilder = IsolateBuilder.builder()
                     .silent()
-                    .cg()
                     .box(boxId)
-                    .clean()
-                    .build();
+                    .clean();
+
+            if (environment.getUseCgroups()) {
+                isolateBuilder.cg();
+            }
+
+            isolateBuilder.build();
         } catch (IOException | InterruptedException e) {
             log.error("Error on processing", e);
         }

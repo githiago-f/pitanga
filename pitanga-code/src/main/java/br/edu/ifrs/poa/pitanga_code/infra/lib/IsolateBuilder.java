@@ -108,8 +108,7 @@ public class IsolateBuilder {
     }
 
     public IsolateBuilder dir(String dir) {
-        args.add("-d");
-        args.add(dir);
+        args.add("--dir=/root=" + dir);
         return this;
     }
 
@@ -155,9 +154,9 @@ public class IsolateBuilder {
     }
 
     public Output build() throws IOException, InterruptedException {
-        log.info("Command -> {}", String.join(" ", args));
-
-        var process = new ProcessBuilder().command(args).start();
+        String command = String.join(" ", args);
+        log.info("Command -> {}", command);
+        var process = new ProcessBuilder().command("sh", "-c", "sudo " + command).start();
         int exitValue = process.waitFor();
 
         Output out = new Output(
@@ -165,7 +164,7 @@ public class IsolateBuilder {
                 process.inputReader().lines().toList(),
                 exitValue);
 
-        log.info("Result for command {} is {}", args, out);
+        log.info("Result -> {}", out);
 
         return out;
     }

@@ -78,13 +78,21 @@ services:
       SHOW_SQL: $SHOW_SQL
       ISSUER_URI: $ISSUER_URI
       JWK_SET_URI: $JWK_SET_URI
-    volumes:
-      - ./pitanga-code:/opt/app
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
-    cgroup_parent: docker.slice
-    tty: true
-    stdin_open: true
+    cgroup_parent: isolate.slice
+    # use this if your system supports, instead of cgroup_parent: isolate.slice
+    # I configured the cgroup parent as isolate.slice and delegated via systemd
+    # a specific subtree
+    # cgroup_parent: docker.slice
+    # security_opt:
+    #   - "cgroupns=host"
+    volumes:
+      - type: bind
+        source: /sys/fs/cgroup
+        target: /sys/fs/cgroup
+        bind:
+          propagation: shared
+      - ./pitanga-code:/opt/app
     networks:
       - pitangaweb
     depends_on:
@@ -109,6 +117,8 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
     cgroup_parent: docker.slice
+    # security_opt:
+    #   - "cgroupns=host"
     networks:
       - pitangaweb
     depends_on:

@@ -1,7 +1,6 @@
 package br.edu.ifrs.poa.pitanga_code.infra.cmd;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;

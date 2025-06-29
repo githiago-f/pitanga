@@ -64,4 +64,6 @@ done
 
 # Build compilers and start the docker container
 docker build -t pitanga/compilers:1.0.0 -f ./docker/compilers.Dockerfile .
+docker compose up -d pitanga-code-dev --build
+
 
