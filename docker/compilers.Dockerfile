@@ -171,7 +171,7 @@ RUN set -xe && \
     git clone https://github.com/ioi/isolate.git /tmp/isolate && \
     cd /tmp/isolate && \
     git checkout v2.0 && \
-    make && make install && \
+    make -j$(nproc) && make install && \
     rm -rf /tmp/*
 ENV BOX_ROOT=/var/local/lib/isolate
 RUN mkdir -p "$BOX_ROOT" && chmod 0700 "$BOX_ROOT"
