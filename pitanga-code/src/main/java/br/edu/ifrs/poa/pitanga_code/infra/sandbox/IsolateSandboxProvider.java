@@ -37,7 +37,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
                 .build();
 
         String out = res.exit() != 0 ? res.err() : res.out();
-        log.error("Cmd exited with {} :: {}", res.exit(), out);
+        log.debug("Cmd exited with {} :: {}", res.exit(), out);
     }
 
     private String createBox(Integer boxId) throws InterruptedException, IOException {
