@@ -1,5 +1,6 @@
 package br.edu.ifrs.poa.pitanga_code.app.http;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +28,12 @@ public class ProblemsController {
     private final ReadProblemsRepository readProblemsRepository;
 
     @GetMapping
-    public ResponseEntity<?> listProblems(Pageable pageable) {
-        return ResponseEntity.ok(readProblemsRepository.findAll(pageable));
+    public ResponseEntity<Page<Problem>> listProblems(Pageable pageable) {
+        Page<Problem> page = readProblemsRepository.findAll(pageable);
+        return ResponseEntity.ok(page);
     }
 
-    @GetMapping(value = { "/{slug}" })
+    @GetMapping("/{slug}")
     public ResponseEntity<Problem> getById(@PathVariable String slug) {
         return readProblemsRepository.findBySlug(slug)
                 .map(problem -> ResponseEntity.ok(problem))
