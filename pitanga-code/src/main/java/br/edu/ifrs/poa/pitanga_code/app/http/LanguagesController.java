@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.ifrs.poa.pitanga_code.app.dtos.Lang;
+import br.edu.ifrs.poa.pitanga_code.domain.coding.dtos.Lang;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import lombok.RequiredArgsConstructor;
 

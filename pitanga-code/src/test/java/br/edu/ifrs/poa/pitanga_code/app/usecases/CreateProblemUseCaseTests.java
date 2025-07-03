@@ -13,22 +13,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateProblemCommand;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioInput;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Scenario;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.Difficulty;
 
-public class CreateChallengeUseCaseTests {
-    private CreateProblemsRepository challengesRepository;
+public class CreateProblemUseCaseTests {
+    private CreateProblemsRepository problemsRepository;
     private LanguagesRepository languagesRepository;
     private List<Language> languages = new ArrayList<>();
     private Authentication user = Mockito.mock(Authentication.class);
+    private CreateProblemUseCase useCase;
 
     @BeforeEach
-    public void setup() {
-        challengesRepository = Mockito.mock(CreateProblemsRepository.class);
-        Mockito.when(challengesRepository.save(Mockito.any(Problem.class)))
+    void setup() {
+        problemsRepository = Mockito.mock(CreateProblemsRepository.class);
+        Mockito.when(problemsRepository.save(Mockito.any(Problem.class)))
                 .thenAnswer(i -> i.getArguments()[0]);
 
         var lang = Language.builder()
@@ -52,37 +55,56 @@ public class CreateChallengeUseCaseTests {
                     }
                     return arr;
                 });
+
+        useCase = new CreateProblemUseCase(problemsRepository, languagesRepository);
+        useCase.setUser(user);
     }
 
     @Test
-    public void shouldAllowEveryLanguageIfNoneIsListed() {
-        CreateProblemUseCase useCase = new CreateProblemUseCase(challengesRepository, languagesRepository);
-        useCase.setUser(user);
-
+    void shouldAllowEveryLanguageIfNoneIsListed() {
         CreateProblemCommand command = new CreateProblemCommand(
                 "Hello World!",
                 "Make your code to print hello world",
                 Difficulty.EASY,
+                List.of(),
                 List.of());
 
-        Problem challenge = useCase.execute(command);
-        assertThat("Challenge allow golang", challenge.checkAllow(languages.get(0)));
-        assertThat("Challenge allow java", challenge.checkAllow(languages.get(1)));
+        Problem problem = useCase.execute(command);
+        assertThat("Problem allow golang", problem.checkAllow(languages.get(0)));
+        assertThat("Problem allow java", problem.checkAllow(languages.get(1)));
     }
 
     @Test
-    public void shouldAllowOnlyTheListedLanguages() {
-        CreateProblemUseCase useCase = new CreateProblemUseCase(challengesRepository, languagesRepository);
-        useCase.setUser(user);
-
+    void shouldAllowOnlyTheListedLanguages() {
         CreateProblemCommand command = new CreateProblemCommand(
                 "Hello World!",
                 "Make your code to print hello world",
                 Difficulty.EASY,
-                List.of(1l));
+                List.of(1l),
+                List.of());
 
-        Problem challenge = useCase.execute(command);
-        assertThat("Challenge allow golang", challenge.checkAllow(languages.get(0)));
-        assertThat("Challenge do not allow java", !challenge.checkAllow(languages.get(1)));
+        Problem problem = useCase.execute(command);
+        assertThat("Problem allow golang", problem.checkAllow(languages.get(0)));
+        assertThat("Problem do not allow java", !problem.checkAllow(languages.get(1)));
+    }
+
+    @Test
+    void shouldPersistTestScenarios() {
+        List<ScenarioInput> testingScenarios = List.of(
+                new ScenarioInput("[1, 2, 3]", true));
+        CreateProblemCommand command = new CreateProblemCommand(
+                "Traverse tree",
+                "...",
+                Difficulty.EASY,
+                List.of(),
+                testingScenarios);
+
+        Problem problem = useCase.execute(command);
+
+        assertThat("Should include the test scenarios to the problem", !problem.getTestingScenarios().isEmpty());
+        for (Scenario scenario : problem.getTestingScenarios()) {
+            assertThat("Should exist scenario input", scenario.getInput().equals("[1, 2, 3]"));
+            assertThat("Should be an example", scenario.getIsExample());
+        }
     }
 }

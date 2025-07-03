@@ -1,9 +1,12 @@
 package br.edu.ifrs.poa.pitanga_code.domain.pbl.entities;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.Difficulty;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.ScenarioID;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +39,7 @@ public class Problem {
     @ManyToMany(targetEntity = Language.class, fetch = FetchType.LAZY)
     private Set<Language> allowedLanguages;
 
-    @OneToMany(mappedBy = "problem", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "problem", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Scenario> testingScenarios;
 
     public Problem(String title, String description, String creator,
@@ -47,11 +50,18 @@ public class Problem {
         this.difficultyLevel = difficultyLevel;
         this.allowedLanguages = allowedLanguages;
 
+        this.testingScenarios = new HashSet<>();
+
         int size = title.length();
         this.slug = title.toLowerCase()
                 .substring(0, size < 100 ? size : 100)
                 .trim()
                 .replace(" ", "-");
+    }
+
+    public void includeScenario(Integer id, Scenario scenario) {
+        this.testingScenarios.add(scenario);
+        scenario.setId(new ScenarioID(id, this.id));
     }
 
     public boolean checkAllow(Language language) {

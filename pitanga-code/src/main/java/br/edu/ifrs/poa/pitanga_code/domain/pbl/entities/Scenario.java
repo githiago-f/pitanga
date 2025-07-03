@@ -1,12 +1,7 @@
 package br.edu.ifrs.poa.pitanga_code.domain.pbl.entities;
 
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.ScenarioID;
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
@@ -18,11 +13,50 @@ public class Scenario {
 
     @Column(columnDefinition = "TEXT")
     private String input;
-    @Column(columnDefinition = "TEXT")
-    private String output;
     private Boolean isExample = false;
 
     @ManyToOne
+    @MapsId("problemId")
     @JoinColumn(insertable = false, updatable = false)
     private Problem problem;
+
+    public Scenario(String input, Boolean isExample) {
+        this.input = input;
+        this.isExample = isExample;
+    }
+
+    public void setId(ScenarioID scenarioID) {
+        this.id = scenarioID;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((input == null) ? 0 : input.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Scenario other = (Scenario) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (input == null) {
+            if (other.input != null)
+                return false;
+        } else if (!input.equals(other.input))
+            return false;
+        return true;
+    }
 }

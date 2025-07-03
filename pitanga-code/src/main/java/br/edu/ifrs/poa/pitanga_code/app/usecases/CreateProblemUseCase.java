@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateProblemCommand;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioInput;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
@@ -31,6 +32,7 @@ public class CreateProblemUseCase {
 
     public Problem execute(CreateProblemCommand command) {
         Set<Language> languages = new HashSet<>();
+        log.info("Setting allowed languages");
         languagesRepository.findAllById(command.allowedLanguages()).forEach(lang -> {
             log.info("Allow language {} for challenge", lang.getName());
             languages.add(lang);
@@ -44,9 +46,20 @@ public class CreateProblemUseCase {
                 languages);
 
         if (problemsRepository.existsBySlug(problem.getSlug())) {
+            log.error("Duplicated problme with slug :: {}", problem.getSlug());
             throw new RuntimeException("Duplicated problem, check for /problems/" + problem.getSlug());
         }
 
-        return problemsRepository.save(problem);
+        int size = command.testingScenarios().size();
+        log.info("Including {} scenarios", size);
+        for (int i = 0; i < size; i++) {
+            ScenarioInput scenario = command.testingScenarios().get(i);
+            problem.includeScenario(i, scenario.toEntity());
+        }
+
+        Problem persistedProblem = problemsRepository.save(problem);
+        log.info("Persisted problem {}", persistedProblem.getId());
+
+        return persistedProblem;
     }
 }
