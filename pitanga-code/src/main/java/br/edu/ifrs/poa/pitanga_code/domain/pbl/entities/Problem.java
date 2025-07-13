@@ -1,7 +1,7 @@
 package br.edu.ifrs.poa.pitanga_code.domain.pbl.entities;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
@@ -40,28 +40,24 @@ public class Problem {
     private Set<Language> allowedLanguages;
 
     @OneToMany(mappedBy = "problem", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Scenario> testingScenarios;
+    private List<Scenario> testingScenarios;
 
-    public Problem(String title, String description, String creator,
+    public Problem(String title, String slug, String description, String creator,
             Difficulty difficultyLevel, Set<Language> allowedLanguages) {
         this.title = title;
         this.description = description;
         this.creator = creator;
         this.difficultyLevel = difficultyLevel;
         this.allowedLanguages = allowedLanguages;
+        this.slug = slug;
 
-        this.testingScenarios = new HashSet<>();
-
-        int size = title.length();
-        this.slug = title.toLowerCase()
-                .substring(0, size < 100 ? size : 100)
-                .trim()
-                .replace(" ", "-");
+        this.testingScenarios = new ArrayList<>();
     }
 
     public void includeScenario(Integer id, Scenario scenario) {
-        this.testingScenarios.add(scenario);
         scenario.setId(new ScenarioID(id, this.id));
+        scenario.setProblem(this);
+        this.testingScenarios.add(scenario);
     }
 
     public boolean checkAllow(Language language) {

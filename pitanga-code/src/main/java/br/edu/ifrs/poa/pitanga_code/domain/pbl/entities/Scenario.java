@@ -1,11 +1,15 @@
 package br.edu.ifrs.poa.pitanga_code.domain.pbl.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.ScenarioID;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "test_scenarios")
 public class Scenario {
     @EmbeddedId
@@ -16,6 +20,7 @@ public class Scenario {
     private Boolean isExample = false;
 
     @ManyToOne
+    @JsonBackReference
     @MapsId("problemId")
     @JoinColumn(insertable = false, updatable = false)
     private Problem problem;
@@ -27,6 +32,10 @@ public class Scenario {
 
     public void setId(ScenarioID scenarioID) {
         this.id = scenarioID;
+    }
+
+    public void setProblem(Problem problem) {
+        this.problem = problem;
     }
 
     @Override

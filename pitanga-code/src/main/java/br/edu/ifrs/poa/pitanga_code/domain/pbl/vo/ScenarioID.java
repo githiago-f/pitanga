@@ -1,5 +1,7 @@
 package br.edu.ifrs.poa.pitanga_code.domain.pbl.vo;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class ScenarioID {
+public class ScenarioID implements Serializable {
     private Integer id;
     private Long problemId;
 
