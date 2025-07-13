@@ -2,9 +2,9 @@ package br.edu.ifrs.poa.pitanga_code.app.dtos;
 
 import java.util.List;
 
-public record RunTestsCommand(
+public record RunTestsRequest(
         String code,
         Long languageId,
-        Long challengeId,
+        Long problemId,
         List<String> inputs) {
 };

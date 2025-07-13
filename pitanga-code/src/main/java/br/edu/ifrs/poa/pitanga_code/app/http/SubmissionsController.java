@@ -2,10 +2,14 @@ package br.edu.ifrs.poa.pitanga_code.app.http;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import br.edu.ifrs.poa.pitanga_code.app.dtos.RunTestsCommand;
+import br.edu.ifrs.poa.pitanga_code.app.dtos.RunTestsRequest;
+import br.edu.ifrs.poa.pitanga_code.app.dtos.SubmissionRequest;
+import br.edu.ifrs.poa.pitanga_code.app.usecases.SubmitProblemSolutionUseCase;
 import br.edu.ifrs.poa.pitanga_code.app.usecases.TestProblemScenariosUseCase;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,15 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @RequestMapping({ "/submissions" })
 public class SubmissionsController {
+    private final SubmitProblemSolutionUseCase submitProblemSolutionUseCase;
     private final TestProblemScenariosUseCase runChallengeTestsUseCase;
 
     @PostMapping
-    public void submit() {
-        // TODO implement submissions handler
+    public void submit(@RequestBody SubmissionRequest request) {
+        submitProblemSolutionUseCase.execute(request);
     }
 
     @PostMapping(value = { "/test" })
-    public List<String> runExamples(@RequestBody RunTestsCommand code) {
-        return runChallengeTestsUseCase.execute(code);
+    public ResponseEntity<?> runExamples(@RequestBody RunTestsRequest code) {
+        List<SandboxResult> results = runChallengeTestsUseCase.execute(code);
+        return ResponseEntity.accepted().body(results);
     }
 }
