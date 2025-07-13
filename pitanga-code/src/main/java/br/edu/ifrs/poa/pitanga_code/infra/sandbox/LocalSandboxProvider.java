@@ -5,15 +5,15 @@ import java.util.List;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 
 @Component
-@Profile("local")
+@Profile("develop")
 public class LocalSandboxProvider implements SandboxProvider {
 
     @Override
-    public List<String> execute(SandboxRunRequest runRequest) {
-        // TODO Auto-generated method stub
+    public List<SandboxResult> execute(SandboxRunRequest runRequest) {
         throw new UnsupportedOperationException("Unimplemented method 'execute'");
     }
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -14,13 +15,14 @@ import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.CmdHelper;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.IsolateBuilder;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.LoadBalanceAlgorithmProvider;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@Profile("isolate")
+@Profile("production")
 @RequiredArgsConstructor
 public class IsolateSandboxProvider implements SandboxProvider {
     private final FilesConfiguration files;
@@ -40,9 +42,20 @@ public class IsolateSandboxProvider implements SandboxProvider {
                 .pipe()
                 .run("sudo", "tee", sourcePath.toString())
                 .and()
-                .run("echo '" + String.join("\n", request.inputLines()) + "'")
+                .build();
+
+        String out = res.exit() != 0 ? res.err() : res.out();
+        log.debug("Cmd exited with {} :: {}", res.exit(), out);
+    }
+
+    public void writeStdin(String line, Path path) {
+        String stdInFile = path.resolve("box")
+                .resolve(files.getStdin())
+                .toString();
+        CmdHelper.Output res = CmdHelper.builder()
+                .run("echo '" + line + "'")
                 .pipe()
-                .run("sudo", "tee", boxDir.resolve(files.getStdin()).toString())
+                .run("sudo", "tee", stdInFile)
                 .build();
 
         String out = res.exit() != 0 ? res.err() : res.out();
@@ -82,7 +95,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return builder;
     }
 
-    private List<String> build(SandboxRunRequest runRequest, int boxId)
+    private Optional<SandboxResult> build(SandboxRunRequest runRequest, int boxId)
             throws InterruptedException, IOException {
         IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
@@ -94,14 +107,13 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
         var box = isolate.run(runRequest.getCompile()).build();
 
-        if (box.error().size() != 0)
-            throw new RuntimeException(box.errorAsString());
+        if (box.error().size() == 0)
+            return Optional.empty();
 
-        return box.out();
+        return Optional.of(new SandboxResult(box.errorAsString(), 0.0, 0.0, 0.0));
     }
 
-    private List<String> run(SandboxRunRequest runRequest, int boxId)
-            throws InterruptedException, IOException {
+    private List<SandboxResult> run(SandboxRunRequest runRequest, Path path, int boxId) {
         IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
                 .in(files.getStdin());
@@ -112,16 +124,24 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
         String[] command = runRequest.getRun();
 
-        var box = isolate.run(command).build();
+        return runRequest.inputLines().stream().map(line -> {
+            writeStdin(line, path);
+            try {
+                var boxOutput = isolate.run(command).build();
 
-        if (box.error().size() != 0)
-            throw new RuntimeException(box.errorAsString());
+                if (boxOutput.error().size() != 0)
+                    return new SandboxResult(boxOutput.errorAsString(), 0d, 0d, 0d);
 
-        return box.out();
+                return new SandboxResult(String.join("\n", boxOutput.out()), 0d, 0d, 0d);
+            } catch (InterruptedException | IOException e) {
+                log.error("System exception", e);
+                return new SandboxResult("Internal server error", 0d, 0d, 0d);
+            }
+        }).toList();
     }
 
     @Override
-    public List<String> execute(SandboxRunRequest runRequest) {
+    public List<SandboxResult> execute(SandboxRunRequest runRequest) {
         int boxId = hashProvider.getNumber();
 
         try {
@@ -130,20 +150,17 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
             setupFiles(runRequest, boxDir);
 
-            List<String> lines = new ArrayList<>();
             if (runRequest.language().getCompileCMD().length != 0) {
-                build(runRequest, boxId).forEach(lines::add);
+                build(runRequest, boxId);
             }
-            run(runRequest, boxId).forEach(lines::add);
 
-            return lines;
+            return run(runRequest, boxDir, boxId);
         } catch (IOException | InterruptedException e) {
             log.error("Error on processing", e);
+            return List.of(new SandboxResult("", 0.0d, 0.0d, 0.0d));
         } finally {
             cleanup(boxId);
         }
-
-        return List.of("Failed");
     }
 
     public void cleanup(Integer boxId) {

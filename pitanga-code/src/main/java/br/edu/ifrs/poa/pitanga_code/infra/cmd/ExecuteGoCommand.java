@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +35,10 @@ public class ExecuteGoCommand implements CommandLineRunner {
                         "\nfunc main(){\n\tfmt.Println(\"Hello, World!\")\n}",
                 List.of(""), lang.get());
 
-        List<String> res = sandboxProvider.execute(srr);
+        List<SandboxResult> res = sandboxProvider.execute(srr);
 
         log.info("{}", res);
-        Assert.isTrue(res.getFirst().equals("Hello, World!"),
+        Assert.isTrue(res.getFirst().output().equals("Hello, World!"),
                 "Response from sandbox should be \"Hello, World!\"");
     }
 }
