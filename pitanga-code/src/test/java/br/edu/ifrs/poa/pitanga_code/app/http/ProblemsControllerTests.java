@@ -10,13 +10,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import br.edu.ifrs.poa.pitanga_code.PitangaTestConfiguration;
 import br.edu.ifrs.poa.pitanga_code.PostgresTestConfiguration;
-import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateProblemCommand;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.Difficulty;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
+import static io.restassured.http.ContentType.JSON;
 import io.restassured.response.ValidatableResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +22,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
@@ -47,70 +46,112 @@ public class ProblemsControllerTests extends PostgresTestConfiguration {
     }
 
     @Test
-    void givenProblemsList_whenGetProblemBySlug_thenStatus200() {
-        List<Problem> problems = List.of(
-                new Problem("Traverse a tree in-order", "...", "1234", Difficulty.EASY, new HashSet<>()),
-                new Problem("Revert a linked list", "...", "1234", Difficulty.HARD, new HashSet<>()));
-        problemsRepository.saveAll(problems);
-
-        for (Problem problem : problems) {
-            given().contentType(ContentType.JSON)
-                    .header("Authorization", "Bearer fake-token")
-                    .when()
-                    .get("/problems/" + problem.getSlug())
-                    .then()
-                    .statusCode(200)
-                    .body("title", equalTo(problem.getTitle()));
-        }
+    void givenProblemsList_whenGetInvalidProblem_thenStatus404() {
+        given().contentType(JSON)
+                .header("Authorization", "Bearer fake-token")
+                .when().get("/problems/any")
+                .then().log().ifValidationFails()
+                .statusCode(404).body(emptyString());
     }
 
     @Test
-    void givenProblemsList_whenGetProblems_thenStatus200() {
+    void givenProblemsList_whenGetProblemsList_thenStatus200() {
         List<Problem> problems = List.of(
-                new Problem("Traverse a tree in-order", "...", "1234", Difficulty.EASY, new HashSet<>()),
-                new Problem("Revert a linked list", "...", "1234", Difficulty.HARD, new HashSet<>()));
+                new Problem("Traverse a tree in-order", "traverse-a-tree-in-order", "...", "1234", Difficulty.EASY,
+                        new HashSet<>()),
+                new Problem("Revert a linked list", "revert-a-linked-list", "...", "1234", Difficulty.HARD,
+                        new HashSet<>()));
         problemsRepository.saveAll(problems);
 
         ValidatableResponse validation = given()
                 .header("Authorization", "Bearer fake-token")
-                .contentType(ContentType.JSON)
+                .contentType(JSON)
                 .when()
                 .get("/problems")
-                .then()
-                .statusCode(200)
-                .body("data", hasSize(2));
+                .then().log().ifValidationFails()
+                .statusCode(200).body("data", hasSize(2));
 
-        int i = 0;
-        for (Problem problem : problems) {
-            validation.body("data[" + i + "].description", nullValue());
-            validation.body("data[" + i + "].title", equalTo(problem.getTitle()));
-
-            i++;
+        for (int i = 0; i < problems.size(); i++) {
+            Problem problem = problems.get(i);
+            validation = validation.body("data[" + i + "].description", nullValue())
+                    .body("data[" + i + "].title", equalTo(problem.getTitle()));
         }
     }
 
     @Test
-    void givenProblemsListEmpty_whenCreateNewProblem_thenStatus201() {
+    void givenNoProblemWithSlugExists_whenCreatingANewProblem_thenResourceIsAvailableAndStatus201() {
         Long sum = problemsRepository.count();
         assertThat("there are no problems on the list", sum == 0);
 
-        String bodyJson = """
-                {
-                    "title": "Traverse a tree in-order",
-                    "description": "...",
-                    "initialDifficultyLevel": "HARD",
-                    "allowedLanguages": [],
-                    "testingScenarios": [{ "input": "[0, 1, 2]", "isExample": false }]
-                }
-                """;
+        String slug = "traverse-a-tree-in-order-i";
+        String title = "Traverse a tree in-order";
+        String bodyJson = String.format("""
+                    {
+                        "title": "%s",
+                        "slug": "%s",
+                        "description": "...",
+                        "initialDifficultyLevel": "HARD",
+                        "allowedLanguages": [],
+                        "testingScenarios": [
+                            { "input": "[0, 1, 2]", "isExample": false },
+                            { "input": "[4, 3, 2]", "isExample": true }
+                        ]
+                    }
+                """, title, slug);
 
-        given().contentType(ContentType.JSON)
+        given().contentType(JSON)
                 .header("Authorization", "Bearer fake-token")
                 .body(bodyJson)
                 .when().post("/problems")
-                .then().statusCode(201)
+                .then().log().ifValidationFails()
+                .statusCode(201)
+                .header("Location", equalTo("/problems/" + slug))
                 .body("id", notNullValue())
-                .body("slug", equalTo("traverse-a-tree-in-order"))
-                .body("title", equalTo("Traverse a tree in-order"));
+                .body("slug", equalTo(slug))
+                .body("title", equalTo(title));
+
+        given().contentType(JSON)
+                .header("Authorization", "Bearer fake-token")
+                .when().get("/problems/" + slug)
+                .then().log().ifValidationFails()
+                .body("title", equalTo(title))
+                .body("scenarios", hasSize(1))
+                .body("scenarios[0].isExample", equalTo(true));
+    }
+
+    @Test
+    void givenProblemWithSLugExists_whenCreatingProblem_thenStatus409() {
+        Long sum = problemsRepository.count();
+        assertThat("there are no problems on the list", sum == 0);
+
+        String slug = "traverse-a-tree-in-order-i";
+        String title = "Traverse a tree in-order";
+        String bodyJson = String.format("""
+                    {
+                        "title": "%s",
+                        "slug": "%s",
+                        "description": "...",
+                        "initialDifficultyLevel": "HARD",
+                        "allowedLanguages": [],
+                        "testingScenarios": [
+                            { "input": "[0, 1, 2]", "isExample": false },
+                            { "input": "[4, 3, 2]", "isExample": true }
+                        ]
+                    }
+                """, title, slug);
+
+        given().contentType(JSON)
+                .body(bodyJson)
+                .header("Authorization", "Bearer fake-token")
+                .when().post("/problems")
+                .then().statusCode(201);
+
+        given().contentType(JSON)
+                .body(bodyJson)
+                .header("Authorization", "Bearer fake-token")
+                .when().post("/problems")
+                .then().statusCode(409)
+                .header("Location", "/problems/" + slug)
+                .body(emptyString());
     }
 }

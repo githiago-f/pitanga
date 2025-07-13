@@ -5,14 +5,14 @@ import org.springframework.security.core.Authentication;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateProblemCommand;
+import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateProblemRequest;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioInput;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Scenario;
@@ -45,15 +45,14 @@ public class CreateProblemUseCaseTests {
         languagesRepository = Mockito.mock(LanguagesRepository.class);
         Mockito.when(languagesRepository.findAllById(Mockito.anyList()))
                 .thenAnswer(call -> {
-                    List<Language> arr = new ArrayList<>();
-                    for (Long id : (List<Long>) call.getArguments()[0]) {
-                        Optional<Language> language = languages.stream()
-                                .filter(l -> l.getId() == id)
-                                .findAny();
-                        if (language.isPresent())
-                            arr.add(language.get());
-                    }
-                    return arr;
+                    Object obj = call.getArguments()[0];
+                    if (obj == null)
+                        return List.of();
+                    if (!(obj instanceof List<?>))
+                        throw new InvalidParameterException("Expected list of long");
+                    return ((List<?>) obj).stream().map(i -> (Long) i)
+                            .map(id -> languages.stream().filter(l -> l.getId() == id).toList().getFirst())
+                            .toList();
                 });
 
         useCase = new CreateProblemUseCase(problemsRepository, languagesRepository);
@@ -62,8 +61,9 @@ public class CreateProblemUseCaseTests {
 
     @Test
     void shouldAllowEveryLanguageIfNoneIsListed() {
-        CreateProblemCommand command = new CreateProblemCommand(
+        CreateProblemRequest command = new CreateProblemRequest(
                 "Hello World!",
+                "hello-world",
                 "Make your code to print hello world",
                 Difficulty.EASY,
                 List.of(),
@@ -76,8 +76,9 @@ public class CreateProblemUseCaseTests {
 
     @Test
     void shouldAllowOnlyTheListedLanguages() {
-        CreateProblemCommand command = new CreateProblemCommand(
+        CreateProblemRequest command = new CreateProblemRequest(
                 "Hello World!",
+                "hello-world",
                 "Make your code to print hello world",
                 Difficulty.EASY,
                 List.of(1l),
@@ -92,8 +93,9 @@ public class CreateProblemUseCaseTests {
     void shouldPersistTestScenarios() {
         List<ScenarioInput> testingScenarios = List.of(
                 new ScenarioInput("[1, 2, 3]", true));
-        CreateProblemCommand command = new CreateProblemCommand(
+        CreateProblemRequest command = new CreateProblemRequest(
                 "Traverse tree",
+                "traverse-tree",
                 "...",
                 Difficulty.EASY,
                 List.of(),
