@@ -35,7 +35,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 512mb
+          memory: 128mb
 
   keycloak:
     build:
@@ -63,8 +63,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: 512mb
+          memory: 1gb
 
   pitanga-code-dev:
     build:
@@ -99,6 +98,10 @@ services:
       - nginx
       - postgres
       - keycloak
+    deploy:
+      resources:
+        limits:
+          memory: 1gb
 
   pitanga-code:
     build:

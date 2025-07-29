@@ -9,9 +9,11 @@ logging:
     org:
       springframework:
         # web: DEBUG
-        security: DEBUG
+        # security: DEBUG
 
 spring:
+  profiles:
+    active: production
   datasource:
     url: ${CHALLENGES_DB_URL:jdbc:postgresql://localhost:5432/postgres}
     password: ${DB_PASSWORD:mysecretpassword}
