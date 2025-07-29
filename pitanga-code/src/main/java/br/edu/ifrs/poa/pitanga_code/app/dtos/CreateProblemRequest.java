@@ -1,8 +1,11 @@
 package br.edu.ifrs.poa.pitanga_code.app.dtos;
 
 import java.util.List;
+import java.util.Set;
 
+import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioInput;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.Difficulty;
 
 public record CreateProblemRequest(
@@ -11,5 +14,22 @@ public record CreateProblemRequest(
         String description,
         Difficulty initialDifficultyLevel,
         List<Long> allowedLanguages,
-        List<ScenarioInput> testingScenarios) {
+        List<ScenarioInput> testingScenarios,
+        String reviewCode,
+        String baseCode,
+        String baseInputCode) {
+
+    public Problem toEntity(String userName, Set<Language> languages) {
+        return Problem.builder()
+                .title(title)
+                .slug(slug)
+                .description(description)
+                .reviewCode(reviewCode)
+                .baseCode(baseCode)
+                .difficultyLevel(initialDifficultyLevel)
+                .allowedLanguages(languages)
+                .baseInputCode(baseInputCode)
+                .creator(userName)
+                .build();
+    }
 }

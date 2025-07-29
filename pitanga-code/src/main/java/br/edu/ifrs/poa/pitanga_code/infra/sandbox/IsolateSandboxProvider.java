@@ -2,8 +2,6 @@ package br.edu.ifrs.poa.pitanga_code.infra.sandbox;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
@@ -15,8 +13,8 @@ import br.edu.ifrs.poa.pitanga_code.app.config.LimitsConfiguration;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.CmdHelper;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.IsolateBuilder;
 import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.LoadBalanceAlgorithmProvider;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,22 +28,21 @@ public class IsolateSandboxProvider implements SandboxProvider {
     private final EnvironmentConfiguration environment;
     private final LoadBalanceAlgorithmProvider hashProvider;
 
-    private void setupFiles(SandboxRunRequest request, Path path) throws IOException {
-        String sourceFile = request.language().getSourceFile();
+    private void setupFiles(BuildDTO buildDto, Path path) throws IOException {
+        String sourceFile = buildDto.language().getSourceFile();
         Path boxDir = path.resolve("box");
         Path sourcePath = boxDir.resolve(sourceFile);
 
         CmdHelper.Output res = CmdHelper.builder()
                 .run("sudo", "touch", sourcePath.toString())
                 .and()
-                .run("echo '" + request.code() + "'")
+                .run("echo '" + buildDto.code() + "'")
                 .pipe()
                 .run("sudo", "tee", sourcePath.toString())
-                .and()
                 .build();
 
         String out = res.exit() != 0 ? res.err() : res.out();
-        log.debug("Cmd exited with {} :: {}", res.exit(), out);
+        log.info("Cmd exited with {} :: {}", res.exit(), out);
     }
 
     public void writeStdin(String line, Path path) {
@@ -95,7 +92,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
         return builder;
     }
 
-    private Optional<SandboxResult> build(SandboxRunRequest runRequest, int boxId)
+    private Optional<SandboxResult> build(BuildDTO runRequest, int boxId)
             throws InterruptedException, IOException {
         IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
@@ -110,10 +107,10 @@ public class IsolateSandboxProvider implements SandboxProvider {
         if (box.error().size() == 0)
             return Optional.empty();
 
-        return Optional.of(new SandboxResult(box.errorAsString(), 0.0, 0.0, 0.0));
+        return Optional.of(new SandboxResult(box.errorAsString()));
     }
 
-    private List<SandboxResult> run(SandboxRunRequest runRequest, Path path, int boxId) {
+    private SandboxResult run(BuildDTO runRequest, int boxId) {
         IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
                 .in(files.getStdin());
@@ -124,50 +121,56 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
         String[] command = runRequest.getRun();
 
-        return runRequest.inputLines().stream().map(line -> {
-            writeStdin(line, path);
-            try {
-                var boxOutput = isolate.run(command).build();
+        try {
+            var boxOutput = isolate.run(command).build();
 
-                if (boxOutput.error().size() != 0)
-                    return new SandboxResult(boxOutput.errorAsString(), 0d, 0d, 0d);
+            if (boxOutput.error().size() != 0)
+                return new SandboxResult(boxOutput.errorAsString());
 
-                return new SandboxResult(String.join("\n", boxOutput.out()), 0d, 0d, 0d);
-            } catch (InterruptedException | IOException e) {
-                log.error("System exception", e);
-                return new SandboxResult("Internal server error", 0d, 0d, 0d);
-            }
-        }).toList();
+            return new SandboxResult(String.join("\n", boxOutput.out()));
+        } catch (InterruptedException | IOException e) {
+            log.error("System exception", e);
+            throw new IllegalStateException("Could not run solution");
+        }
     }
 
     @Override
-    public List<SandboxResult> execute(SandboxRunRequest runRequest) {
+    public Box setup(BuildDTO buildDTO) {
         int boxId = hashProvider.getNumber();
 
         try {
             Path boxDir = Path.of(createBox(boxId));
+
             log.info("Box created at {}", boxDir);
 
-            setupFiles(runRequest, boxDir);
+            setupFiles(buildDTO, boxDir);
 
-            if (runRequest.language().getCompileCMD().length != 0) {
-                build(runRequest, boxId);
+            if (buildDTO.getCompile().length != 0) {
+                Optional<SandboxResult> result = build(buildDTO, boxId);
+                if (result.isPresent()) {
+                    throw new IllegalStateException(result.get().output());
+                }
             }
 
-            return run(runRequest, boxDir, boxId);
-        } catch (IOException | InterruptedException e) {
-            log.error("Error on processing", e);
-            return List.of(new SandboxResult("", 0.0d, 0.0d, 0.0d));
-        } finally {
-            cleanup(boxId);
+            return new Box(boxId, boxDir);
+        } catch (InterruptedException | IOException e) {
+            log.error("Failed to build code due to {}", e);
+            throw new IllegalStateException("Failed to build code");
         }
     }
 
-    public void cleanup(Integer boxId) {
+    @Override
+    public SandboxResult execute(Box box, BuildDTO buildDTO, String inputLine) {
+        writeStdin(inputLine, box.path());
+        return run(buildDTO, box.id());
+    }
+
+    @Override
+    public void cleanup(Box box) {
         try {
             IsolateBuilder isolateBuilder = IsolateBuilder.builder()
                     .silent()
-                    .box(boxId)
+                    .box(box.id())
                     .clean();
 
             if (environment.getUseCgroups()) {

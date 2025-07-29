@@ -13,10 +13,12 @@ import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.CreateSubmissionRep
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.vo.SubmissionId;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Scenario;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.errors.ProblemNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.ReadProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider.Box;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,24 +45,27 @@ public class SubmitProblemSolutionUseCase {
             throw new LanguageNotFoundException(runCommand.languageId());
         }
 
-        List<String> input = problem.get().getTestingScenarios()
-                .stream().map(i -> i.getInput()).toList();
+        List<Scenario> scenarios = problem.get().getTestingScenarios();
+        BuildDTO request = new BuildDTO(runCommand.code(), language.get());
 
-        SandboxRunRequest request = new SandboxRunRequest(
-                runCommand.code(),
-                input,
-                language.get());
+        Box box = sandboxProvider.setup(request);
+        try {
+            int i = 0;
+            for (; i < scenarios.size(); i++) {
+                sandboxProvider.execute(box, request, scenarios.get(i).getInput());
+            }
 
-        sandboxProvider.execute(request);
+            Submission submission = new Submission(
+                    new SubmissionId(1l, problem.get().getId()),
+                    runCommand.code(),
+                    i + 1 == scenarios.size() ? "PASS" : "ERROR",
+                    i + 1,
+                    problem.get(),
+                    language.get());
 
-        Submission submission = new Submission(
-                new SubmissionId(1l, problem.get().getId()),
-                runCommand.code(),
-                "PASS",
-                1,
-                problem.get(),
-                language.get());
-
-        return submissionsRepository.save(submission);
+            return submissionsRepository.save(submission);
+        } finally {
+            sandboxProvider.cleanup(box);
+        }
     }
 }

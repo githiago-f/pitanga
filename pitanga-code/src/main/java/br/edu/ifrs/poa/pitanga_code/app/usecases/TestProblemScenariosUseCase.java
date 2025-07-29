@@ -15,8 +15,9 @@ import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.LanguageNotFoundExcepti
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider.Box;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,8 +48,16 @@ public class TestProblemScenariosUseCase {
             throw new InvalidLanguageException(problem.get().getAllowedLanguages());
         }
 
-        SandboxRunRequest request = new SandboxRunRequest(code.code(), code.inputs(), language.get());
+        BuildDTO request = new BuildDTO(code.code(), language.get());
 
-        return sandboxProvider.execute(request);
+        Box box = sandboxProvider.setup(request);
+        try {
+            return code.inputs()
+                    .stream()
+                    .map(i -> sandboxProvider.execute(box, request, i))
+                    .toList();
+        } finally {
+            sandboxProvider.cleanup(box);
+        }
     }
 }

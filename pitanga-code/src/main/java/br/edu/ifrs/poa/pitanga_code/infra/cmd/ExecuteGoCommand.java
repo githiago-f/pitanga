@@ -10,8 +10,9 @@ import org.springframework.util.Assert;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider.Box;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,15 +31,20 @@ public class ExecuteGoCommand implements CommandLineRunner {
             log.info("Invalid language, there shuld be a language with id = 6");
             return;
         }
-        SandboxRunRequest srr = new SandboxRunRequest(
+        BuildDTO srr = new BuildDTO(
                 "package main\nimport \"fmt\"" +
                         "\nfunc main(){\n\tfmt.Println(\"Hello, World!\")\n}",
-                List.of(""), lang.get());
+                lang.get());
 
-        List<SandboxResult> res = sandboxProvider.execute(srr);
+        Box box = sandboxProvider.setup(srr);
+        try {
+            SandboxResult res = sandboxProvider.execute(box, srr, "");
 
-        log.info("{}", res);
-        Assert.isTrue(res.getFirst().output().equals("Hello, World!"),
-                "Response from sandbox should be \"Hello, World!\"");
+            log.info("{}", res);
+            Assert.isTrue(res.output().equals("Hello, World!"),
+                    "Response from sandbox should be \"Hello, World!\"");
+        } finally {
+            sandboxProvider.cleanup(box);
+        }
     }
 }

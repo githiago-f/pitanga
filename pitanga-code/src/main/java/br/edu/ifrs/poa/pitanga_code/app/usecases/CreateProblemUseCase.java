@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestScope
 @RequiredArgsConstructor
 public class CreateProblemUseCase {
+    private final EvaluateTestScenariosUseCase evaluateTestScenariosUseCase;
     private final CreateProblemsRepository problemsRepository;
     private final LanguagesRepository languagesRepository;
 
@@ -39,13 +40,7 @@ public class CreateProblemUseCase {
             languages.add(lang);
         });
 
-        Problem problem = new Problem(
-                command.title(),
-                command.slug(),
-                command.description(),
-                user.getName(),
-                command.initialDifficultyLevel(),
-                languages);
+        Problem problem = command.toEntity(user.getName(), languages);
 
         if (problemsRepository.existsBySlug(problem.getSlug())) {
             log.error("Duplicated problme with slug :: {}", problem.getSlug());
@@ -63,6 +58,9 @@ public class CreateProblemUseCase {
         }
 
         problemsRepository.save(persistedProblem);
+        log.info("Problem persisted :: {}", persistedProblem.getId());
+
+        evaluateTestScenariosUseCase.execute(persistedProblem);
 
         return persistedProblem;
     }

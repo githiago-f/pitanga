@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
 
 @TestConfiguration
 public class PitangaTestConfiguration {
@@ -28,8 +28,17 @@ public class PitangaTestConfiguration {
     public SandboxProvider sandbox() {
         return new SandboxProvider() {
             @Override
-            public List<SandboxResult> execute(SandboxRunRequest runRequest) {
-                return List.of(new SandboxResult("Hello, World!", 0d, 0d, 0d));
+            public Integer setup(BuildDTO buildDTO) {
+                return 1;
+            }
+
+            @Override
+            public void cleanup(Integer identifier) {
+            }
+
+            @Override
+            public SandboxResult execute(Integer identifier, BuildDTO buildDTO) {
+                return new SandboxResult("Hello, World!", "");
             }
         };
     }

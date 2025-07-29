@@ -1,10 +1,18 @@
 package br.edu.ifrs.poa.pitanga_code.infra.sandbox;
 
-import java.util.List;
-
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxRunRequest;
+
+import java.nio.file.Path;
+
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
 
 public interface SandboxProvider {
-    List<SandboxResult> execute(SandboxRunRequest runRequest);
+    public record Box(Integer id, Path path) {
+    }
+
+    Box setup(BuildDTO buildDTO);
+
+    void cleanup(Box box);
+
+    SandboxResult execute(Box box, BuildDTO buildDTO, String inputLine);
 }

@@ -19,6 +19,9 @@ public class Scenario {
     private String input;
     private Boolean isExample = false;
 
+    @Column(columnDefinition = "TEXT")
+    private String expectedOutput;
+
     @ManyToOne
     @JsonBackReference
     @MapsId("problemId")
@@ -28,6 +31,10 @@ public class Scenario {
     public Scenario(String input, Boolean isExample) {
         this.input = input;
         this.isExample = isExample;
+    }
+
+    public void setExpectedOutput(String output) {
+        expectedOutput = output;
     }
 
     public void setId(ScenarioID scenarioID) {
