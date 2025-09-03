@@ -1,6 +1,13 @@
 FROM buildpack-deps:buster AS base
 
-LABEL version="1.0.0"
+RUN set -xe && \
+    sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends libpq-dev sudo && \
+    rm -rf /var/lib/apt/lists/*
+
+LABEL version="2.0.0"
 
 FROM base AS clang
 ########################
@@ -28,8 +35,8 @@ RUN set -xe && \
     --disable-multilib \
     --enable-languages=c,c++$ENABLE_FORTRAN \
     --prefix=/usr/local/gcc-$VERSION  > configure.log && \
-    make -j$(nproc) -s && \
-    make -j$(nproc) -s install-strip && \
+    make -j$(nproc) && \
+    make -j$(nproc) install-strip && \
     rm -rf /tmp/*; \
     done
 
@@ -195,7 +202,7 @@ COPY --from=nodejs /usr/bin/tsc /usr/bin/tsc
 COPY --from=nodejs /usr/lib/node_modules /usr/lib/node_modules
 
 COPY --from=lua /usr/local/lua-5.4.8 /usr/local/lua-5.4.8
-COPY --from=lua /lib/x86_64-linux-gnu/libreadline.so.7 /lib/x86_64-linux-gnu/libreadline.so.7
+# COPY --from=lua /lib/x86_64-linux-gnu/libreadline.so.7 /lib/x86_64-linux-gnu/libreadline.so.7
 
 RUN cd /usr/local/lua-5.4.8/lua-5.4.8 && make && make install && cd /
 RUN ln -s /lib/x86_64-linux-gnu/libreadline.so.7 \

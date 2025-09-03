@@ -42,8 +42,9 @@ RUN keytool -importcert \
     -alias keycloak \
     -storepass changeit
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN set -xe && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
     libpq-dev \
     sudo \
     && rm -rf /var/lib/apt/lists/*

@@ -22,6 +22,8 @@ while read_dom; do
     fi
 done < pom.xml
 
+# docker build -t pitanga/compilers:1.0.0 -f ./docker/compilers.Dockerfile .
+
 # Create cert for each project and also for keyclock
 KEY_PATH=$CERT_BASE_PATH/key.pem
 CERT_PATH=$CERT_BASE_PATH/certificate.pem
@@ -63,7 +65,5 @@ for project in "${projects[@]}"; do
 done
 
 # Build compilers and start the docker container
-docker build -t pitanga/compilers:1.0.0 -f ./docker/compilers.Dockerfile .
 docker compose up -d pitanga-code-dev --build
-
 
