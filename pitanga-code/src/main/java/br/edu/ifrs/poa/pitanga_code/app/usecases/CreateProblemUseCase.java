@@ -1,6 +1,6 @@
 package br.edu.ifrs.poa.pitanga_code.app.usecases;
 
-import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.security.core.Authentication;
@@ -12,6 +12,8 @@ import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioInput;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.errors.DuplicatedProblemException;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
+import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.CouldntExecuteException;
+import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.LanguageNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +35,17 @@ public class CreateProblemUseCase {
     }
 
     public Problem execute(CreateProblemRequest command) {
-        Set<Language> languages = new HashSet<>();
-        log.info("Setting allowed languages");
-        languagesRepository.findAllById(command.allowedLanguages()).forEach(lang -> {
-            log.info("Allow language {} for challenge", lang.getName());
-            languages.add(lang);
-        });
+        Set<Language> languages = languagesRepository.findAllByIds(command.allowedLanguages());
+        Optional<Language> baseLanguage = languagesRepository.findById(command.baseLanguage());
 
-        Problem problem = command.toEntity(user.getName(), languages);
+        if (baseLanguage.isEmpty()) {
+            throw new LanguageNotFoundException(command.baseLanguage());
+        }
+
+        Problem problem = command.toEntity(
+                user.getName(),
+                baseLanguage.get(),
+                languages);
 
         if (problemsRepository.existsBySlug(problem.getSlug())) {
             log.error("Duplicated problme with slug :: {}", problem.getSlug());
@@ -60,7 +65,13 @@ public class CreateProblemUseCase {
         problemsRepository.save(persistedProblem);
         log.info("Problem persisted :: {}", persistedProblem.getId());
 
-        evaluateTestScenariosUseCase.execute(persistedProblem);
+        try {
+            evaluateTestScenariosUseCase.execute(persistedProblem);
+        } catch (RuntimeException e) {
+            problemsRepository.delete(persistedProblem);
+            log.error("Failed to test the base code {}", e);
+            throw new CouldntExecuteException();
+        }
 
         return persistedProblem;
     }

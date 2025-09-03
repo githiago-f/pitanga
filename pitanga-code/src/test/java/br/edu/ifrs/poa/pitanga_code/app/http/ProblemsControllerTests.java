@@ -56,11 +56,19 @@ public class ProblemsControllerTests extends PostgresTestConfiguration {
 
     @Test
     void givenProblemsList_whenGetProblemsList_thenStatus200() {
+        var builder = Problem.builder()
+                .description("...")
+                .creator("1234")
+                .difficultyLevel(Difficulty.EASY)
+                .allowedLanguages(new HashSet<>());
+
         List<Problem> problems = List.of(
-                new Problem("Traverse a tree in-order", "traverse-a-tree-in-order", "...", "1234", Difficulty.EASY,
-                        new HashSet<>()),
-                new Problem("Revert a linked list", "revert-a-linked-list", "...", "1234", Difficulty.HARD,
-                        new HashSet<>()));
+                builder.title("Traverse a tree in-order")
+                        .slug("traverse-a-tree-in-order")
+                        .build(),
+                builder.title("Revert a linked list")
+                        .slug("revert-a-linked-list")
+                        .build());
         problemsRepository.saveAll(problems);
 
         ValidatableResponse validation = given()

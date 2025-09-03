@@ -1,5 +1,6 @@
 server:
   port: 8443
+  address: "0.0.0.0"
   ssl:
     certificate: classpath:certs/certificate.pem
     certificate-private-key: classpath:certs/key.pem

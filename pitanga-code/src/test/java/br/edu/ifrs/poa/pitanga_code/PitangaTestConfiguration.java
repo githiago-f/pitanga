@@ -1,5 +1,6 @@
 package br.edu.ifrs.poa.pitanga_code;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.boot.test.context.TestConfiguration;
@@ -28,17 +29,17 @@ public class PitangaTestConfiguration {
     public SandboxProvider sandbox() {
         return new SandboxProvider() {
             @Override
-            public Integer setup(BuildDTO buildDTO) {
-                return 1;
+            public Box setup(BuildDTO buildDTO) {
+                return new Box(1, Path.of(""));
             }
 
             @Override
-            public void cleanup(Integer identifier) {
+            public void cleanup(Box box) {
             }
 
             @Override
-            public SandboxResult execute(Integer identifier, BuildDTO buildDTO) {
-                return new SandboxResult("Hello, World!", "");
+            public SandboxResult execute(Box box, BuildDTO buildDTO, String inputLine) {
+                return new SandboxResult("Hello, World!");
             }
         };
     }

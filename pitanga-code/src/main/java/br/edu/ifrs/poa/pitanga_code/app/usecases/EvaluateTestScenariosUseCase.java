@@ -8,7 +8,9 @@ import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider.Box;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EvaluateTestScenariosUseCase {
@@ -16,6 +18,8 @@ public class EvaluateTestScenariosUseCase {
 
     public void execute(Problem problem) {
         String code = problem.getBaseCode().replace("%%PITANGA_USER_CODE%%", problem.getReviewCode());
+
+        log.debug("Running confirmation on code :: \n{}", code);
 
         BuildDTO buildDTO = new BuildDTO(code, problem.getBaseLanguage());
         Box identifier = sandboxProvider.setup(buildDTO);
