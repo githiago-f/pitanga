@@ -42,7 +42,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
                 .build();
 
         String out = res.exit() != 0 ? res.err() : res.out();
-        log.info("Cmd exited with {} :: {}", res.exit(), out);
+        log.debug("Cmd exited with {} :: {}", res.exit(), out);
     }
 
     public void writeStdin(String line, Path path) {
@@ -141,7 +141,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
         try {
             Path boxDir = Path.of(createBox(boxId));
 
-            log.info("Box created at {}", boxDir);
+            log.debug("Box created at {}", boxDir);
 
             setupFiles(buildDTO, boxDir);
 

@@ -5,7 +5,7 @@
     "source_file": "main.asm",
     "environment": [],
     "compile_cmd": "/usr/local/nasm-2.14.02/bin/nasmld -f elf64 main.asm",
-    "run_command": "./$BINARY_FILE"
+    "run_command": "./main"
   },
   {
     "id": 2,
