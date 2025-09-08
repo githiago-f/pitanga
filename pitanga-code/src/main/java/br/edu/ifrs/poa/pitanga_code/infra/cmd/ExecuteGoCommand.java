@@ -1,6 +1,6 @@
 package br.edu.ifrs.poa.pitanga_code.infra.cmd;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -24,16 +24,15 @@ public class ExecuteGoCommand implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Running execute Go in sandbox");
-        Optional<Language> lang = languagesRepository.findById(6l);
-        if (lang.isEmpty()) {
-            log.info("Invalid language, there shuld be a language with id = 6");
+        log.info("Checking sandbox");
+        var languages = languagesRepository.findByName("Go");
+        if (languages.isEmpty()) {
+            log.error("Invalid language, there shuld be a language with name = Go");
             return;
         }
-        BuildDTO srr = new BuildDTO(
-                "package main\nimport \"fmt\"" +
-                        "\nfunc main(){\n\tfmt.Println(\"Hello, World!\")\n}",
-                lang.get());
+
+        String code = "package main\nimport \"fmt\"\nfunc main(){\n\tfmt.Println(\"Hello, World!\")\n}";
+        BuildDTO srr = new BuildDTO(code, languages.get(0));
 
         Box box = sandboxProvider.setup(srr);
         try {

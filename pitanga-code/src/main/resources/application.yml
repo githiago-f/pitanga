@@ -4,12 +4,18 @@ server:
   ssl:
     certificate: classpath:certs/certificate.pem
     certificate-private-key: classpath:certs/key.pem
+  undertow:
+    threads:
+      io: 4
+      worker: 64
+      buffer-size: 1024
+      direct-buffers: true
 
 logging:
   level:
     org:
       springframework:
-        # web: DEBUG
+        web: DEBUG
         # security: DEBUG
 
 spring:

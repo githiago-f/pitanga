@@ -155,7 +155,7 @@ public class IsolateBuilder {
 
     public Output build() throws IOException, InterruptedException {
         String command = String.join(" ", args);
-        log.info("Command -> {}", command);
+        log.debug("Command -> {}", command);
         var process = new ProcessBuilder().command("sh", "-c", "sudo " + command).start();
         int exitValue = process.waitFor();
 
@@ -164,7 +164,7 @@ public class IsolateBuilder {
                 process.inputReader().lines().toList(),
                 exitValue);
 
-        log.info("Result -> {}", out);
+        log.debug("Result -> {}", out);
 
         return out;
     }

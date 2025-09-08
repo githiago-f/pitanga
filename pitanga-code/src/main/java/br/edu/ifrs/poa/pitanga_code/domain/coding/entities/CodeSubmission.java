@@ -4,24 +4,21 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import br.edu.ifrs.poa.pitanga_code.domain.coding.vo.SubmissionId;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
 @Getter
+@Builder
 @AllArgsConstructor
-public class Submission {
+public class CodeSubmission {
     @EmbeddedId
     private SubmissionId id;
     private String code;
-    private String status;
-    private Integer passedTestCases;
+
+    private Integer[] passingScenarios;
 
     @JsonBackReference
     @MapsId("problemId")

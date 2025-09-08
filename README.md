@@ -1,6 +1,6 @@
 <div style="text-align: center;">
-    <img src="./docs/pitanga-icon.svg" alt="Pitanga Icon" style="height: 64px;"/>
-    <h1>Pitanga</h1>
+    <img src="./docs/pitanga-icon.svg" alt="Pitanga Icon" style="height: 64px; width: 64px;"/>
+    <h1 style="text-align: center;">Pitanga</h1>
 </div>
 
 ## Overview

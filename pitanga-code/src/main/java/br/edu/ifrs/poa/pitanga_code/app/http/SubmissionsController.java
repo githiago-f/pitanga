@@ -23,7 +23,7 @@ public class SubmissionsController {
 
     @PostMapping
     public void submit(@RequestBody SubmissionRequest request) {
-        submitProblemSolutionUseCase.execute(request);
+        var submissionResult = submitProblemSolutionUseCase.execute(request);
     }
 
     @PostMapping(value = { "/test" })

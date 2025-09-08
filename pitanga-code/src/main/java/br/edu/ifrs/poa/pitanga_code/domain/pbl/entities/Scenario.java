@@ -3,6 +3,7 @@ package br.edu.ifrs.poa.pitanga_code.domain.pbl.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.ScenarioID;
+import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.SandboxResult;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,10 @@ public class Scenario {
 
     public void setProblem(Problem problem) {
         this.problem = problem;
+    }
+
+    public boolean check(SandboxResult result) {
+        return result.output().equals(expectedOutput);
     }
 
     @Override

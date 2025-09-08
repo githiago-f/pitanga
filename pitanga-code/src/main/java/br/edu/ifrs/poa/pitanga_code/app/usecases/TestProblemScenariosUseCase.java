@@ -30,9 +30,9 @@ public class TestProblemScenariosUseCase {
     private final CreateProblemsRepository challengesRepository;
     private final SandboxProvider sandboxProvider;
 
-    public List<SandboxResult> execute(RunTestsRequest code) {
-        Optional<Problem> problem = challengesRepository.findById(code.problemId());
-        Optional<Language> language = languagesRepository.findById(code.languageId());
+    public List<?> execute(RunTestsRequest code) {
+        var problem = challengesRepository.findById(code.problemId());
+        var language = languagesRepository.findById(code.languageId());
 
         if (problem.isEmpty()) {
             log.warn("Problem(id={}) not found when submiting a solution", code.problemId());
@@ -52,10 +52,7 @@ public class TestProblemScenariosUseCase {
 
         Box box = sandboxProvider.setup(request);
         try {
-            return code.inputs()
-                    .stream()
-                    .map(i -> sandboxProvider.execute(box, request, i))
-                    .toList();
+            return List.of();
         } finally {
             sandboxProvider.cleanup(box);
         }
