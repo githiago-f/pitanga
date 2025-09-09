@@ -17,7 +17,7 @@ public class EvaluateTestScenariosUseCase {
     private final SandboxProvider sandboxProvider;
 
     public void execute(Problem problem) {
-        String code = problem.getBaseCode().replace("%%PITANGA_USER_CODE%%", problem.getReviewCode());
+        String code = problem.verificationCode();
 
         log.debug("Running confirmation on code :: \n{}", code);
 

@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Problem {
+    private static final String CODE_PLACEHOLDER = "%%PITANGA_USER_CODE%%";
+
     @Id
     @Column(name = "problem_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -60,6 +62,14 @@ public class Problem {
     @Builder.Default
     @OneToMany(mappedBy = "problem", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Scenario> testingScenarios = new ArrayList<>();
+
+    public String verificationCode(final String code) {
+        return baseCode.replace(CODE_PLACEHOLDER, code);
+    }
+
+    public String verificationCode() {
+        return baseCode.replace(CODE_PLACEHOLDER, reviewCode);
+    }
 
     public void includeScenario(Integer id, Scenario scenario) {
         scenario.setId(new ScenarioID(id, this.id));

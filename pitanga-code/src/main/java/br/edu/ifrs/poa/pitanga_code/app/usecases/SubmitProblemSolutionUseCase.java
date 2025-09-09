@@ -1,5 +1,7 @@
 package br.edu.ifrs.poa.pitanga_code.app.usecases;
 
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Service;
 
 import br.edu.ifrs.poa.pitanga_code.app.dtos.SubmissionRequest;
@@ -7,6 +9,7 @@ import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.CodeSubmission;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.LanguageNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.CreateSubmissionRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioOutput;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Scenario;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.errors.ProblemNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.ReadProblemsRepository;
@@ -44,21 +47,28 @@ public class SubmitProblemSolutionUseCase {
 
         Box box = sandboxProvider.setup(request);
         try {
-            int passingCount = 0, failingCount = 0;
+            int passingCount = 0;
+            Scenario failingScenario = null;
 
             for (Scenario scenario : scenarios) {
                 String input = scenario.getInput();
                 var result = sandboxProvider.execute(box, request, input);
 
-                if (scenario.check(result)) {
-                } else {
+                var output = new ScenarioOutput(input, scenario.getExpectedOutput(), result.output());
+                if (!output.getPass()) {
+                    failingScenario = scenario;
+                    break;
                 }
+
+                passingCount++;
             }
 
             CodeSubmission submission = CodeSubmission.builder()
                     .code(runCommand.code())
                     .language(language.get())
                     .problem(problem.get())
+                    .failingScenario(failingScenario)
+                    .passingScenarios(passingCount)
                     .build();
 
             return submissionsRepository.save(submission);
