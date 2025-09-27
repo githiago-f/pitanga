@@ -17,19 +17,21 @@ public class EvaluateTestScenariosUseCase {
     private final SandboxProvider sandboxProvider;
 
     public void execute(Problem problem) {
-        String code = problem.verificationCode();
+        String code = problem.getReviewCode();
 
         log.debug("Running confirmation on code :: \n{}", code);
 
         BuildDTO buildDTO = new BuildDTO(code, problem.getBaseLanguage());
         Box identifier = sandboxProvider.setup(buildDTO);
 
-        for (Scenario scenario : problem.getTestingScenarios()) {
-            var res = sandboxProvider.execute(identifier, buildDTO, scenario.getInput());
+        try {
+            for (Scenario scenario : problem.getTestingScenarios()) {
+                var res = sandboxProvider.execute(identifier, buildDTO, scenario.getInput());
 
-            scenario.setExpectedOutput(res.output());
+                scenario.setExpectedOutput(res.output());
+            }
+        } finally {
+            sandboxProvider.cleanup(identifier);
         }
-
-        sandboxProvider.cleanup(identifier);
     }
 }

@@ -14,4 +14,8 @@ public record BuildDTO(String code, Language language) {
     public String[] getCompile() {
         return language.getCompileCMD();
     }
+
+    public Boolean hasCompileCommand() {
+        return getCompile().length != 0;
+    }
 }

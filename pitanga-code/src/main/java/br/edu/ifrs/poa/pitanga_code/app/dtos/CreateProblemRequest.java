@@ -16,8 +16,6 @@ public record CreateProblemRequest(
         List<Long> allowedLanguages,
         List<ScenarioInput> testingScenarios,
         String reviewCode,
-        String baseCode,
-        String baseInputCode,
         Long baseLanguage) {
 
     public Problem toEntity(String userName, Language baseLanguage, Set<Language> languages) {
@@ -26,10 +24,8 @@ public record CreateProblemRequest(
                 .slug(slug)
                 .description(description)
                 .reviewCode(reviewCode)
-                .baseCode(baseCode)
                 .difficultyLevel(initialDifficultyLevel)
                 .allowedLanguages(languages)
-                .baseInputCode(baseInputCode)
                 .baseLanguage(baseLanguage)
                 .creator(userName)
                 .build();

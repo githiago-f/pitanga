@@ -13,9 +13,17 @@ server:
 
 logging:
   level:
+    br:
+      edu:
+        ifrs:
+          poa:
+            pitanga_code:
+              infra:
+                lib: DEBUG
+                sandbox: DEBUG
     org:
       springframework:
-        web: DEBUG
+        # web: DEBUG
         # security: DEBUG
 
 spring:
@@ -55,6 +63,7 @@ pitanga:
       memory: ${MEMORY_LIMIT:128000}
       stack: ${STACK_LIMIT:10000}
       file-size: ${MAX_FILE_SIZE:1048576}
+      open-files: ${MAX_OPEN_FILES:0}
       processes-and-threads: ${MAX_PROCESSES_AND_OR_THREADS:120}
 
       # when creating new challenges, this will be used as max on validation

@@ -48,8 +48,8 @@ public class TestProblemScenariosUseCase {
 
         var problem = maybeProblem.get();
 
-        var request = new BuildDTO(problem.verificationCode(code.code()), language.get());
-        var verificationRequest = new BuildDTO(problem.verificationCode(), problem.getBaseLanguage());
+        var request = new BuildDTO(code.code(), language.get());
+        var verificationRequest = new BuildDTO(problem.getReviewCode(), problem.getBaseLanguage());
 
         Box box = sandboxProvider.setup(request);
         Box verificationBox = sandboxProvider.setup(verificationRequest);

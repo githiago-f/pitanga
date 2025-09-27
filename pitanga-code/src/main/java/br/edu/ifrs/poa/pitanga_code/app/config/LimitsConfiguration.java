@@ -15,6 +15,7 @@ public class LimitsConfiguration {
     private Integer memory;
     private Integer stack;
     private Integer fileSize;
+    private Integer openFiles;
     private Integer processesAndThreads;
 
     private Double maxCpuTime;

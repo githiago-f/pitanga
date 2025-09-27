@@ -107,6 +107,12 @@ public class IsolateBuilder {
         return this;
     }
 
+    public IsolateBuilder filesOpen(Integer max) {
+        args.add("-n");
+        args.add(String.valueOf(max));
+        return this;
+    }
+
     public IsolateBuilder dir(String dir) {
         args.add("--dir=/root=" + dir);
         return this;

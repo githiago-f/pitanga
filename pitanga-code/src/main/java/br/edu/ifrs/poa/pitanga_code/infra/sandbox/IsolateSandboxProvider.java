@@ -1,6 +1,7 @@
 package br.edu.ifrs.poa.pitanga_code.infra.sandbox;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -31,32 +32,43 @@ public class IsolateSandboxProvider implements SandboxProvider {
     private void setupFiles(BuildDTO buildDto, Path path) throws IOException {
         String sourceFile = buildDto.language().getSourceFile();
         Path boxDir = path.resolve("box");
-        Path sourcePath = boxDir.resolve(sourceFile);
+        var sourcePath = boxDir.resolve(sourceFile).toString();
+
+        var temp = Files.createTempFile(path.toString().replace("/", "-"), sourceFile);
+        Files.write(temp, buildDto.code().getBytes());
 
         CmdHelper.Output res = CmdHelper.builder()
-                .run("sudo", "touch", sourcePath.toString())
+                .run("sudo", "touch", sourcePath)
                 .and()
-                .run("echo '" + buildDto.code() + "'")
+                .run("cat " + temp.toString())
                 .pipe()
-                .run("sudo", "tee", sourcePath.toString())
+                .run("sudo", "tee", sourcePath)
                 .build();
 
         String out = res.exit() != 0 ? res.err() : res.out();
         log.debug("Cmd exited with {} :: {}", res.exit(), out);
+
+        Files.deleteIfExists(temp);
     }
 
-    public void writeStdin(String line, Path path) {
+    private void writeStdin(String line, Path path) throws IOException {
+        var temp = Files.createTempFile(path.toString().replace("/", "-"), files.getStdin());
+        Files.write(temp, (line + "\n").getBytes());
+
         String stdInFile = path.resolve("box")
                 .resolve(files.getStdin())
                 .toString();
+
         CmdHelper.Output res = CmdHelper.builder()
-                .run("echo '" + line + "'")
+                .run("cat " + temp.toString())
                 .pipe()
                 .run("sudo", "tee", stdInFile)
                 .build();
 
         String out = res.exit() != 0 ? res.err() : res.out();
         log.debug("Cmd exited with {} :: {}", res.exit(), out);
+
+        Files.deleteIfExists(temp);
     }
 
     private String createBox(Integer boxId) throws InterruptedException, IOException {
@@ -96,6 +108,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
             throws InterruptedException, IOException {
         IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
+                .filesOpen(0)
                 .in("/dev/null");
 
         for (String envVar : runRequest.getEnv()) {
@@ -113,6 +126,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
     private SandboxResult run(BuildDTO runRequest, int boxId) {
         IsolateBuilder isolate = getIsolateBuilder()
                 .box(boxId)
+                .filesOpen(limits.getOpenFiles())
                 .in(files.getStdin());
 
         for (String envVar : runRequest.getEnv()) {
@@ -145,7 +159,7 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
             setupFiles(buildDTO, boxDir);
 
-            if (buildDTO.getCompile().length != 0) {
+            if (buildDTO.hasCompileCommand()) {
                 Optional<SandboxResult> result = build(buildDTO, boxId);
                 if (result.isPresent()) {
                     throw new IllegalStateException(result.get().output());
@@ -161,8 +175,13 @@ public class IsolateSandboxProvider implements SandboxProvider {
 
     @Override
     public SandboxResult execute(Box box, BuildDTO buildDTO, String inputLine) {
-        writeStdin(inputLine, box.path());
-        return run(buildDTO, box.id());
+        try {
+            writeStdin(inputLine, box.path());
+            return run(buildDTO, box.id());
+        } catch (IOException e) {
+            log.error("IO expection on execute");
+            return null;
+        }
     }
 
     @Override

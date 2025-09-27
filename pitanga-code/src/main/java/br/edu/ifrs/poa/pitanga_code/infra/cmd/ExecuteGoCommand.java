@@ -1,12 +1,9 @@
 package br.edu.ifrs.poa.pitanga_code.infra.cmd;
 
-import java.util.List;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
 import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider.Box;
