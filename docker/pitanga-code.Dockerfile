@@ -19,7 +19,7 @@ RUN mvn clean package -DskipTests
 #####################################
 # Stage 2: Create the Runtime Image #
 #####################################
-FROM pitanga/compilers:1.0.0 AS production
+FROM githiago/pitanga-compilers:1.0.0 AS production
 
 WORKDIR /opt/app
 
