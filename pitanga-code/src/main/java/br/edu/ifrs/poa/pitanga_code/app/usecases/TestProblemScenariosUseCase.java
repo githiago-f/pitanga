@@ -9,7 +9,6 @@ import br.edu.ifrs.poa.pitanga_code.app.dtos.RunTestsRequest;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioOutput;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.errors.ProblemNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.errors.TooManyTestInputsException;
-import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.InvalidLanguageException;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.LanguageNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
@@ -27,28 +26,17 @@ public class TestProblemScenariosUseCase {
     private final SandboxProvider sandboxProvider;
 
     public List<ScenarioOutput> execute(RunTestsRequest code) {
-        var maybeProblem = challengesRepository.findById(code.problemId());
-        var language = languagesRepository.findById(code.languageId());
-
         if (code.inputs().size() > 10) {
             throw new TooManyTestInputsException();
         }
 
-        if (maybeProblem.isEmpty()) {
-            throw new ProblemNotFoundException(code.problemId());
-        }
+        var problem = challengesRepository.findById(code.problemId())
+                .orElseThrow(() -> new ProblemNotFoundException(code.problemId()));
 
-        if (language.isEmpty()) {
-            throw new LanguageNotFoundException(code.languageId());
-        }
+        var language = languagesRepository.findById(code.languageId())
+                .orElseThrow(() -> new LanguageNotFoundException(code.languageId()));
 
-        if (!maybeProblem.get().checkAllow(language.get())) {
-            throw new InvalidLanguageException(maybeProblem.get().getAllowedLanguages());
-        }
-
-        var problem = maybeProblem.get();
-
-        var request = new BuildDTO(code.code(), language.get());
+        var request = new BuildDTO(code.code(), language);
         var verificationRequest = new BuildDTO(problem.getReviewCode(), problem.getBaseLanguage());
 
         Box box = sandboxProvider.setup(request);

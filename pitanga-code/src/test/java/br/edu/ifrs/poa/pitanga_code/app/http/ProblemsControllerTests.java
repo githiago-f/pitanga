@@ -59,8 +59,7 @@ public class ProblemsControllerTests extends PostgresTestConfiguration {
         var builder = Problem.builder()
                 .description("...")
                 .creator("1234")
-                .difficultyLevel(Difficulty.EASY)
-                .allowedLanguages(new HashSet<>());
+                .difficultyLevel(Difficulty.EASY);
 
         List<Problem> problems = List.of(
                 builder.title("Traverse a tree in-order")
@@ -99,7 +98,6 @@ public class ProblemsControllerTests extends PostgresTestConfiguration {
                         "slug": "%s",
                         "description": "...",
                         "initialDifficultyLevel": "HARD",
-                        "allowedLanguages": [],
                         "testingScenarios": [
                             { "input": "[0, 1, 2]", "isExample": false },
                             { "input": "[4, 3, 2]", "isExample": true }
@@ -140,7 +138,6 @@ public class ProblemsControllerTests extends PostgresTestConfiguration {
                         "slug": "%s",
                         "description": "...",
                         "initialDifficultyLevel": "HARD",
-                        "allowedLanguages": [],
                         "testingScenarios": [
                             { "input": "[0, 1, 2]", "isExample": false },
                             { "input": "[4, 3, 2]", "isExample": true }

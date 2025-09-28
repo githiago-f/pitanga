@@ -20,32 +20,30 @@ import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.Difficulty;
+import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.Mediator;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CreateProblemUseCaseTests {
     private CreateProblemsRepository problemsRepository;
     private LanguagesRepository languagesRepository;
-    private EvaluateTestScenariosUseCase evaluateTestScenariosUseCase;
     private List<Language> languages = new ArrayList<>();
     private Authentication user = Mockito.mock(Authentication.class);
     private CreateProblemUseCase useCase;
 
     private static CreateProblemRequest makeRequest(String name,
-            List<Long> allowedLanguages,
             List<ScenarioInput> testingScenarios) {
         return new CreateProblemRequest(
                 name,
                 name.replace('\s', '-').replaceAll("[!/$#@]", ""),
                 "Make your code to print hello world",
                 Difficulty.EASY,
-                allowedLanguages,
                 testingScenarios,
-                "", "", "", 6l);
+                "", 6l);
     }
 
     @BeforeEach
     void setup() {
-        evaluateTestScenariosUseCase = Mockito.mock(EvaluateTestScenariosUseCase.class);
-
         problemsRepository = Mockito.mock(CreateProblemsRepository.class);
         Mockito.when(problemsRepository.save(Mockito.any(Problem.class)))
                 .thenAnswer(i -> i.getArguments()[0]);
@@ -72,35 +70,21 @@ public class CreateProblemUseCaseTests {
                 });
 
         useCase = new CreateProblemUseCase(
-                evaluateTestScenariosUseCase,
+                new Mediator() {
+                    public <T> void dispatch(Mediator.Message<T> message) {
+                        log.info("Message of type {}", message.type());
+                    };
+                },
                 problemsRepository,
                 languagesRepository);
         useCase.setUser(user);
     }
 
     @Test
-    void shouldAllowEveryLanguageIfNoneIsListed() {
-        CreateProblemRequest command = makeRequest("Hello World!", List.of(), List.of());
-
-        Problem problem = useCase.execute(command);
-        assertThat("Problem allow golang", problem.checkAllow(languages.get(0)));
-        assertThat("Problem allow java", problem.checkAllow(languages.get(1)));
-    }
-
-    @Test
-    void shouldAllowOnlyTheListedLanguages() {
-        CreateProblemRequest command = makeRequest("Hello World!", List.of(1l), List.of());
-
-        Problem problem = useCase.execute(command);
-        assertThat("Problem allow golang", problem.checkAllow(languages.get(0)));
-        assertThat("Problem do not allow java", !problem.checkAllow(languages.get(1)));
-    }
-
-    @Test
     void shouldPersistTestScenarios() {
         List<ScenarioInput> testingScenarios = List.of(
                 new ScenarioInput("[1, 2, 3]", true));
-        CreateProblemRequest command = makeRequest("Traverse tree", List.of(), testingScenarios);
+        CreateProblemRequest command = makeRequest("Traverse tree", testingScenarios);
 
         Problem problem = useCase.execute(command);
 

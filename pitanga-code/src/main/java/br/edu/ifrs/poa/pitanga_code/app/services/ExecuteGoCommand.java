@@ -1,4 +1,4 @@
-package br.edu.ifrs.poa.pitanga_code.infra.cmd;
+package br.edu.ifrs.poa.pitanga_code.app.services;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

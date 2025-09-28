@@ -1,32 +1,35 @@
 package br.edu.ifrs.poa.pitanga_code.app.usecases;
 
-import java.util.ArrayList;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
 
 import br.edu.ifrs.poa.pitanga_code.app.dtos.SubmissionRequest;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.CodeSubmission;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.LanguageNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.CreateSubmissionRepository;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
-import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioOutput;
-import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Scenario;
+import br.edu.ifrs.poa.pitanga_code.domain.coding.vo.SubmissionId;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.errors.ProblemNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.ReadProblemsRepository;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.SandboxProvider.Box;
-import br.edu.ifrs.poa.pitanga_code.infra.sandbox.dto.BuildDTO;
+import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.Mediator;
+import static br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.Mediator.Message;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Setter
+@RequestScope
 @RequiredArgsConstructor
 public class SubmitProblemSolutionUseCase {
     private final CreateSubmissionRepository submissionsRepository;
     private final ReadProblemsRepository problemsRepository;
     private final LanguagesRepository languagesRepository;
-    private final SandboxProvider sandboxProvider;
+    private final Mediator mediator;
+
+    private Authentication user;
 
     public CodeSubmission execute(SubmissionRequest runCommand) {
         var language = languagesRepository.findById(runCommand.languageId());
@@ -42,38 +45,23 @@ public class SubmitProblemSolutionUseCase {
             throw new LanguageNotFoundException(runCommand.languageId());
         }
 
-        var scenarios = problem.get().getTestingScenarios();
-        var request = new BuildDTO(runCommand.code(), language.get());
+        var lastSubmission = submissionsRepository.findByProblemIdOderedDesc(
+                problem.get().getId(), user.getName());
 
-        Box box = sandboxProvider.setup(request);
-        try {
-            int passingCount = 0;
-            Scenario failingScenario = null;
+        long lastId = lastSubmission.stream().map(i -> i.getId().getId()).findFirst().orElse(0l) + 1l;
 
-            for (Scenario scenario : scenarios) {
-                String input = scenario.getInput();
-                var result = sandboxProvider.execute(box, request, input);
+        CodeSubmission submissionData = CodeSubmission.builder()
+                .creatorId(user.getName())
+                .id(new SubmissionId(lastId, problem.get().getId()))
+                .code(runCommand.code())
+                .language(language.get())
+                .problem(problem.get())
+                .build();
 
-                var output = new ScenarioOutput(input, scenario.getExpectedOutput(), result.output());
-                if (!output.getPass()) {
-                    failingScenario = scenario;
-                    break;
-                }
+        CodeSubmission submission = submissionsRepository.save(submissionData);
 
-                passingCount++;
-            }
+        mediator.dispatch(new Message<>("new-submission", submission.getId()));
 
-            CodeSubmission submission = CodeSubmission.builder()
-                    .code(runCommand.code())
-                    .language(language.get())
-                    .problem(problem.get())
-                    .failingScenario(failingScenario)
-                    .passingScenarios(passingCount)
-                    .build();
-
-            return submissionsRepository.save(submission);
-        } finally {
-            sandboxProvider.cleanup(box);
-        }
+        return submissionData;
     }
 }

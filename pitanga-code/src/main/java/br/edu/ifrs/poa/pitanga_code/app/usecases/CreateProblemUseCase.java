@@ -1,7 +1,6 @@
 package br.edu.ifrs.poa.pitanga_code.app.usecases;
 
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -12,40 +11,35 @@ import br.edu.ifrs.poa.pitanga_code.domain.pbl.dto.ScenarioInput;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.entities.Problem;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.errors.DuplicatedProblemException;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
-import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.CouldntExecuteException;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.errors.LanguageNotFoundException;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.repository.CreateProblemsRepository;
+import br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.Mediator;
+import static br.edu.ifrs.poa.pitanga_code.infra.lib.interfaces.Mediator.Message;
 import br.edu.ifrs.poa.pitanga_code.domain.coding.repository.LanguagesRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Setter
 @RequestScope
 @RequiredArgsConstructor
 public class CreateProblemUseCase {
-    private final EvaluateTestScenariosUseCase evaluateTestScenariosUseCase;
+    private final Mediator mediator;
     private final CreateProblemsRepository problemsRepository;
     private final LanguagesRepository languagesRepository;
 
     private Authentication user;
 
-    public void setUser(Authentication user) {
-        this.user = user;
-    }
-
     public Problem execute(CreateProblemRequest command) {
-        Set<Language> languages = languagesRepository.findAllByIds(command.allowedLanguages());
         Optional<Language> baseLanguage = languagesRepository.findById(command.baseLanguage());
 
         if (baseLanguage.isEmpty()) {
             throw new LanguageNotFoundException(command.baseLanguage());
         }
 
-        Problem problem = command.toEntity(
-                user.getName(),
-                baseLanguage.get(),
-                languages);
+        Problem problem = command.toEntity(user.getName(), baseLanguage.get());
 
         if (problemsRepository.existsBySlug(problem.getSlug())) {
             log.error("Duplicated problme with slug :: {}", problem.getSlug());
@@ -57,21 +51,16 @@ public class CreateProblemUseCase {
 
         int size = command.testingScenarios().size();
         log.info("Including {} scenarios", size);
+
         for (int i = 0; i < size; i++) {
             ScenarioInput scenario = command.testingScenarios().get(i);
-            persistedProblem.includeScenario(i, scenario.toEntity());
+            persistedProblem.includeScenario(i + 1, scenario.toEntity());
         }
 
         problemsRepository.save(persistedProblem);
         log.info("Problem persisted :: {}", persistedProblem.getId());
 
-        try {
-            evaluateTestScenariosUseCase.execute(persistedProblem);
-        } catch (RuntimeException e) {
-            problemsRepository.delete(persistedProblem);
-            log.error("Failed to test the base code {}", e);
-            throw new CouldntExecuteException();
-        }
+        mediator.dispatch(new Message<>("new-problem", persistedProblem.getId()));
 
         return persistedProblem;
     }

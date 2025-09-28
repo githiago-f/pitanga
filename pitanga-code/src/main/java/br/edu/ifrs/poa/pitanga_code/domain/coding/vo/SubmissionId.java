@@ -15,6 +15,10 @@ public class SubmissionId implements Serializable {
     private Long id;
     private Long problemId;
 
+    public void setProblemId(Long problemId) {
+        this.problemId = problemId;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

@@ -12,7 +12,7 @@ public class LBRoundRobbingProvider implements LoadBalanceAlgorithmProvider {
 
     @Override
     public int getNumber() {
-        if (counter + 1 == Integer.MAX_VALUE) {
+        if (counter + 1 == 999) {
             counter = 0;
         }
         return counter++;

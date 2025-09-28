@@ -34,8 +34,12 @@ public class IsolateSandboxProvider implements SandboxProvider {
         Path boxDir = path.resolve("box");
         var sourcePath = boxDir.resolve(sourceFile).toString();
 
+        log.debug("Writing files");
+
         var temp = Files.createTempFile(path.toString().replace("/", "-"), sourceFile);
         Files.write(temp, buildDto.code().getBytes());
+
+        log.debug("Sending write command");
 
         CmdHelper.Output res = CmdHelper.builder()
                 .run("sudo", "touch", sourcePath)

@@ -1,12 +1,11 @@
 package br.edu.ifrs.poa.pitanga_code.domain.pbl.entities;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import br.edu.ifrs.poa.pitanga_code.domain.coding.entities.Language;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.Difficulty;
+import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.ProblemStatus;
 import br.edu.ifrs.poa.pitanga_code.domain.pbl.vo.ScenarioID;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -48,8 +47,8 @@ public class Problem {
     private Difficulty difficultyLevel;
 
     @Builder.Default
-    @ManyToMany(targetEntity = Language.class, fetch = FetchType.LAZY)
-    private Set<Language> allowedLanguages = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    private ProblemStatus status = ProblemStatus.PENDING;
 
     @Builder.Default
     @OneToMany(mappedBy = "problem", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -61,9 +60,13 @@ public class Problem {
         this.testingScenarios.add(scenario);
     }
 
-    public boolean checkAllow(Language language) {
-        return allowedLanguages == null ||
-                allowedLanguages.size() == 0 ||
-                allowedLanguages.contains(language);
+    public void setStatus(ProblemStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Problem[id=" + id + ", title=" + title + ", slug=" + slug
+                + ", reviewCode=" + reviewCode + ", creator=" + creator + "]";
     }
 }

@@ -1,7 +1,6 @@
 package br.edu.ifrs.poa.pitanga_code;
 
 import java.nio.file.Path;
-import java.util.List;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

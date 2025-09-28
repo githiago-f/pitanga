@@ -6,8 +6,8 @@ server:
     certificate-private-key: classpath:certs/key.pem
   undertow:
     threads:
-      io: 4
-      worker: 64
+      io: 1
+      worker: 10
       buffer-size: 1024
       direct-buffers: true
 
@@ -49,6 +49,7 @@ spring:
 
 pitanga:
   sandbox:
+    workers-num: 2
     environment:
       default-path: 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'
       use-cgroups: ${USE_CGROUPS:false}

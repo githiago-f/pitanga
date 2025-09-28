@@ -7,12 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.edu.ifrs.poa.pitanga_code.app.dtos.CreateProblemRequest;
 import br.edu.ifrs.poa.pitanga_code.app.usecases.CreateProblemUseCase;
@@ -41,6 +36,13 @@ public class ProblemsController {
     public ResponseEntity<ProblemItem> getBySlug(@PathVariable String slug) {
         return readProblemsRepository.findBySlugWithExamples(slug)
                 .map(p -> new ProblemItem(p, false))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/view")
+    public ResponseEntity<Problem> getById(@PathVariable Long id) {
+        return readProblemsRepository.findByIdWithExamples(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
