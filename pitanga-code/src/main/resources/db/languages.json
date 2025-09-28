@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Assembly (NASM)",
+    "source_file": "main.asm",
+    "environment": [],
+    "compile_cmd": "/usr/local/nasm-2.14.02/bin/nasmld -f elf64 main.asm",
+    "run_command": "./main"
+  },
+  {
+    "id": 2,
+    "name": "Bash 5.0",
+    "source_file": "script.sh",
+    "compile_cmd": "",
+    "environment": [],
+    "run_command": "/usr/local/bash-5.0/bin/bash script.sh"
+  },
+  {
+    "id": 5,
+    "name": "C (GCC 9.2.0)",
+    "source_file": "main.c",
+    "environment": [],
+    "compile_cmd": "/usr/local/gcc-9.2.0/bin/gcc main.c",
+    "run_command": "./a.out"
+  },
+  {
+    "id": 6,
+    "name": "Go",
+    "source_file": "main.go",
+    "environment": ["GOCACHE=/tmp/.cache/go-build", "GO111MODULE=off"],
+    "compile_cmd": "/usr/local/go-1.24/bin/go build main.go",
+    "run_command": "./main"
+  },
+  {
+    "id": 7,
+    "name": "Java",
+    "source_file": "Main.java",
+    "environment": [],
+    "compile_cmd": "/usr/local/jdk21/bin/javac Main.java",
+    "run_command": "/usr/local/jdk21/bin/java Main"
+  },
+  {
+    "id": 8,
+    "name": "JavaScript (Node.js)",
+    "source_file": "script.js",
+    "environment": [],
+    "compile_cmd": "",
+    "run_command": "/usr/bin/node script.js"
+  },
+  {
+    "id": 9,
+    "name": "Lua",
+    "source_file": "script.lua",
+    "environment": [],
+    "compile_cmd": "/usr/bin/luac script.lua",
+    "run_command": "/usr/bin/lua ./luac.out"
+  },
+  {
+    "id": 10,
+    "name": "SQLite",
+    "source_file": "script.sql",
+    "environment": [],
+    "compile_cmd": "",
+    "run_command": "/bin/cat script.sql | /usr/bin/sqlite3 db.sqlite"
+  },
+  {
+    "id": 11,
+    "name": "Python 2",
+    "source_file": "script.py",
+    "environment": [],
+    "compile_cmd": "",
+    "run_command": "/usr/local/python-2.7.17/bin/python2 script.py"
+  },
+  {
+    "id": 12,
+    "name": "Python 3",
+    "source_file": "script.py",
+    "environment": [],
+    "compile_cmd": "",
+    "run_command": "/usr/local/python-3.13.2/bin/python3 script.py"
+  },
+  {
+    "id": 13,
+    "name": "TypeScript 5.8",
+    "source_file": "script.ts",
+    "environment": [],
+    "compile_cmd": "/usr/bin/tsc script.ts",
+    "run_command": "/usr/bin/node script.js"
+  }
+]

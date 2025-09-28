@@ -1,0 +1,75 @@
+server:
+  port: 8443
+  address: "0.0.0.0"
+  ssl:
+    certificate: classpath:certs/certificate.pem
+    certificate-private-key: classpath:certs/key.pem
+  undertow:
+    threads:
+      io: 1
+      worker: 10
+      buffer-size: 1024
+      direct-buffers: true
+
+logging:
+  level:
+    br:
+      edu:
+        ifrs:
+          poa:
+            pitanga_code:
+              infra:
+                lib: DEBUG
+                sandbox: DEBUG
+    org:
+      springframework:
+        # web: DEBUG
+        # security: DEBUG
+
+spring:
+  profiles:
+    active: production
+  datasource:
+    url: ${CHALLENGES_DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    password: ${DB_PASSWORD:mysecretpassword}
+    username: ${DB_USERNAME:postgres}
+    driver-class-name: org.postgresql.Driver
+  main:
+    allow-bean-definition-overriding: true
+  jpa:
+    show-sql: ${SHOW_SQL:true}
+    hibernate:
+      ddl-auto: update # drop-and-create
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI:https://localhost/auth/realms/master}
+          jwk-set-uri: ${JWK_SET_URI:https://localhost/auth/realms/master/protocol/openid-connect/certs}
+
+pitanga:
+  sandbox:
+    workers-num: 2
+    environment:
+      default-path: 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'
+      use-cgroups: ${USE_CGROUPS:false}
+    files:
+      stdin: stdin.txt
+      stdout: stdout.txt
+      stderr: stderr.txt
+    limits:
+      cpu-time: ${CPU_TIME_LIMIT:30}
+      extra-cpu-time: ${CPU_EXTRA_TIME:10}
+      wall-time: ${WALL_TIME_LIMIT:10}
+      memory: ${MEMORY_LIMIT:128000}
+      stack: ${STACK_LIMIT:10000}
+      file-size: ${MAX_FILE_SIZE:1048576}
+      open-files: ${MAX_OPEN_FILES:0}
+      processes-and-threads: ${MAX_PROCESSES_AND_OR_THREADS:120}
+
+      # when creating new challenges, this will be used as max on validation
+      max-cpu-time: ${MAX_CPU_TIME_LIMIT:15}
+      max-extra-cpu-time: ${MAX_CPU_EXTRA_TIME:5}
+      max-memory: ${MAX_MEMORY_LIMIT:512000}
+      max-wall-time: ${MAX_WALL_TIME_LIMIT:20}
+      max-stack: ${MAX_STACK_LIMIT:128000}
